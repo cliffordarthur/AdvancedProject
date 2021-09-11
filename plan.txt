@@ -1,0 +1,21 @@
+TODO: pvz
+
+plants: 
+	sunflower/potato mine/spikeweed/wall-nut/pumpkin
+	damage/attack speed/attack range/attack type
+	health point
+	costs/cool down time
+	others
+
+zombies:
+	zombie/gonehead zombie
+	damage/attack speed/attack range/attack type
+	health point
+	move speed
+	others
+
+others:
+	cleaner(maybe?)
+
+map:
+	x * y (?)
