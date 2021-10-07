@@ -1,14 +1,18 @@
+#pragma once 
 #include "common.h"
 #include "map.h"
+#include "plant.h"
 
 class Game {
     int score;
     int sun;
     int cursor_x, cursor_y;
     Map map;
+    Shop shop;
     WINDOW* win;
     bool lose, esc;
     clock_t begin, now;
+    int time_counter;
 public:
     Game();
     void init();
@@ -21,4 +25,6 @@ public:
     void input(char ch);
     void check();
     bool check_lose();
+    void show_info();
+    void show_help();
 };
