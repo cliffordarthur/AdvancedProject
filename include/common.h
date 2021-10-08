@@ -43,5 +43,8 @@
 #define YELLOW_BLACK 3
 #define BLUE_BLACK 4
 
-enum Plantname{shovel, sunflower, wallnut, spikeweed, pumpkin};
+#define ZOMBIE_NUM 3
 
+enum Plantname{shovel, sunflower, wallnut, spikeweed, pumpkin};//TODO: peashooter, cherrybomb, snowpea
+
+enum Zombiename{zombie, conehead};//TODO: polevault, newspaper, ...

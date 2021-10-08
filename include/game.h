@@ -2,6 +2,7 @@
 #include "common.h"
 #include "map.h"
 #include "plant.h"
+#include "zombie.h"
 
 class Game {
     int score;
@@ -24,7 +25,7 @@ public:
     void wait();
     void input(char ch);
     void check();
-    bool check_lose();
+    // bool check_lose();
     void show_info();
     void show_help();
 };

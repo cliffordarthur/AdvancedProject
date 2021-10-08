@@ -3,7 +3,7 @@
 
 Game::Game() {
     score = 0;
-    sun = 10000;
+    sun = 100;
     cursor_x = 0;
     cursor_y = 0;
     lose = false;
@@ -12,8 +12,7 @@ Game::Game() {
 }
 
 void Game::init() {
-    // map.init();
-    
+
     win = initscr();
     cbreak();
     keypad(stdscr, true);
@@ -75,7 +74,7 @@ void Game::input(char ch) {
             break;
         }
         case KEYDOWN: {
-            if (cursor_x<MAP_LINE-1) cursor_x++;
+            if ((cursor_x<MAP_LINE-1)&&!(cursor_x==MAP_LINE-2 && cursor_y==MAP_COL-1)) cursor_x++;
             break;
         }
         case KEYLEFT: {
@@ -83,7 +82,7 @@ void Game::input(char ch) {
             break;
         }
         case KEYRIGHT: {
-            if (cursor_y<MAP_COL-1) cursor_y++;
+            if ((cursor_y<MAP_COL-1)&&!(cursor_x==MAP_LINE-1 && cursor_y==MAP_COL-2)) cursor_y++;
             break;
         }
         case '0':
@@ -121,13 +120,9 @@ void Game::input(char ch) {
             shop.clear_cart();
             break;
         }
+        case 'c':sun+=10000;break;
         default: break;
     }
-}
-
-bool Game::check_lose() {
-    //TODO:
-    return lose;
 }
 
 void Game::gen_sun() {
@@ -138,16 +133,21 @@ void Game::gen_sun() {
 }
 
 void Game::gen_zombie() {
+    if (rand()%(FPS*5)==0) {
+        int type = zombie;
+        if (rand()%5 == 0) type = conehead;
+        
+        // map.grids[MAP_LINE-1][MAP_COL-1].add_zombie()
+    }
     //TODO: 
 }
 
 void Game::check() {
     //TODO: update the information inside
-    if (esc || check_lose()) return;
-    score+=1;
+    if (esc || lose) return;
     gen_sun();
     gen_zombie();
-    map.update(sun);
+    map.update(sun, lose);
 }
 
 void Game::show_help() {
