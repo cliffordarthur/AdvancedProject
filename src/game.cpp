@@ -194,7 +194,7 @@ void Game::show_help() {
 
     printc(WHITE_BLACK, "If you do not want to play, you can press ");
     printc(YELLOW_BLACK, "ESC ");
-    printc(WHITE_BLACK, "to quit.\n");
+    printc(WHITE_BLACK, "to quit.\n\n");
 
     printc(WHITE_BLACK, "Now, press ");
     printc(YELLOW_BLACK, "ENTER ");

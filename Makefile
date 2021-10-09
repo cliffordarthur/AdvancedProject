@@ -1,5 +1,5 @@
 cc = g++
-build_dir = ./build
+build_dir = ./bin
 src = $(shell find ./src/ -name "*.cpp")
 deps = $(shell find ./include/ -name "*.h")
 prom = $(build_dir)/$(notdir $(CURDIR))
