@@ -38,6 +38,7 @@ public:
     int show_HP()const{return HP;}
     int show_counter()const{return counter;}
     int show_range()const{return range;}
+    bool show_attacked()const{return attacked;} 
     void be_attacked(int h){HP-=h; if (HP<0) HP=0;}
 };
 

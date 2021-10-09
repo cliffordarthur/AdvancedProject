@@ -1,6 +1,7 @@
 #include "../../include/map.h"
 
 int get_digits(int num) {
+    if (num==0) return 1;
     int d = 0;
     while (num>0) {
         num/=10;
@@ -27,12 +28,16 @@ bool Map::find_enemy(bool is_plant, int r, int x, int y){
         }
     }
     else {
-        if (grids[x][y].p_num) return true;
+        if (grids[x][y].p_num) {
+            if (!grids[x][y].has_pumpkin && !grids[x][y].plant_0->show_attacked()) return false;
+            return true;
+        }
+        
     }
     return false;
 }
 
-void Map::update(int& sun, bool& lose) {
+void Map::update(int& sun, bool& lose, int& score) {
     for (int i = 0; i < MAP_LINE; i++) { 
         for (int j = 0; j < MAP_COL; j++) {
             if (grids[i][j].plant_p) {
@@ -40,9 +45,9 @@ void Map::update(int& sun, bool& lose) {
                     grids[i][j].use_shovel();
                 }
             }
-            else if (grids[i][j].plant_0) {
+            if (grids[i][j].plant_0) {
                 if (grids[i][j].plant_0->show_HP() <= 0) {
-                    grids[i][j].use_shovel();
+                    grids[i][j].use_shovel(1);
                 }
                 else{
                     grids[i][j].plant_0->find_zombie = find_enemy(true, grids[i][j].plant_0->show_range(), i, j);
@@ -77,6 +82,7 @@ void Map::update(int& sun, bool& lose) {
                 for (int k = 0; k < ZOMBIE_NUM; k++) {
                     if (!grids[i][j].zombies[k]) continue;
                     if (grids[i][j].zombies[k]->show_HP() <= 0) {
+                        score += zombie_table[grids[i][j].zombies[k]->show_type()].score;
                         grids[i][j].free_zombie(k);
                     }
                     else {
@@ -163,6 +169,21 @@ void Map::draw(int cursor_x, int cursor_y) {
                         int HP = grids[mapline][tmp_y].plant_p->show_HP();
                         printc(YELLOW_BLACK, " %s %d", plant_table[pumpkin].name, HP);
                         j+=(strlen(plant_table[pumpkin].name)+get_digits(HP)+1);
+                    }
+                    else if (i>=2 && grids[mapline][tmp_y].z_num > i-2) {
+                        int ii = i-2;
+                        for (int k = 0; k < ZOMBIE_NUM; k++) {
+                            if (grids[mapline][tmp_y].zombies[k]){
+                                if (!ii) {
+                                    int tmp_type = grids[mapline][tmp_y].zombies[k]->show_type();
+                                    int HP = grids[mapline][tmp_y].zombies[k]->show_HP();
+                                    printc(BLUE_BLACK, " %s %d", zombie_table[tmp_type].name, HP);
+                                    j+=(strlen(zombie_table[tmp_type].name)+get_digits(HP)+1);
+                                    break;
+                                }
+                                ii--;
+                            }
+                        }
                     }
                     else printw(" ");
                 }

@@ -18,6 +18,7 @@ public:
     bool can_plant(int c);
     void add_plant(int c);
     int use_shovel();
+    int use_shovel(int c);
 
     bool add_zombie(Zombies* z);
     void del_zombie(int z);
@@ -30,7 +31,7 @@ class Map{
 public:
     bool can_buy;
     Map();
-    void update(int& sun, bool& lose);
+    void update(int& sun, bool& lose, int& score);
     void draw(int cursor_x, int cursor_y);
     bool find_enemy(bool is_plant, int r, int x, int y);
     friend class Game;

@@ -6,6 +6,8 @@ Grid::Grid(){
     has_pumpkin = false;
     p_num = 0;
     z_num = 0;
+
+    for (int i = 0; i < ZOMBIE_NUM; i++) zombies[i] = NULL;
 }
 
 void Grid::set_coordinate(int x0, int y0) {
@@ -66,13 +68,20 @@ int Grid::use_shovel(){
     }
 }
 
+int Grid::use_shovel(int c) {
+    p_num--;
+    delete this->plant_0;
+    this->plant_0 = NULL;
+    return c;
+}
+
 bool Grid::add_zombie(Zombies *z){
     if (z_num < ZOMBIE_NUM) {
-        z_num++;
+        z_num++; 
         for (int i = 0; i < ZOMBIE_NUM; i++) {
-            if (!zombies[i]){
+            if (this->zombies[i]==NULL){
                 z->block = false;
-                zombies[i] = z;
+                this->zombies[i] = z;
                 return true;
             }
         }

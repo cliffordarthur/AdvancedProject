@@ -6,15 +6,15 @@ prom = $(build_dir)/$(notdir $(CURDIR))
 obj = $(src:./src/%.cpp=$(build_dir)/%.o)
 
 $(prom): $(obj) $(build_dir)
-	$(cc) -o $(prom) $(obj) -lcurses
+	@$(cc) -o $(prom) $(obj) -lcurses
 
 .PHONY: run clean
 run: $(obj)
-	$(cc) -o $(prom) $(obj) -lcurses && $(prom)
+	@$(cc) -o $(prom) $(obj) -lcurses && $(prom)
 
 $(build_dir)/%.o: ./src/%.cpp $(deps)
 	@mkdir -p $(dir $@)
-	$(cc) -c $< -o $@
+	@$(cc) -c $< -o $@
 
 clean: 
 	rm -rf $(build_dir)

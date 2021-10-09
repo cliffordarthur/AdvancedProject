@@ -6,14 +6,14 @@ void Zombies::cooldown() {
 }
 
 int Zombies::walk() {
-    // path
-    // ^        <--
-    // |<-- 0     |  1
+    // path: 
+    // 0: RD->LD->LU
+    // 1: RD->RU->LU
     if (!block) {
         scounter--;
         if (scounter==0) {
-              scounter = stride;
-           return 1;
+            scounter = stride;
+            return 1;
         }
         return 0;
     }
@@ -26,7 +26,8 @@ Zombie::Zombie() {
     this->damage = 1;
     this->speed = zombie_table[this->type].speed;
     this->counter = this->speed;
-    this->scounter = zombie_table[this->type].stride;
+    this->stride = zombie_table[this->type].stride;
+    this->scounter = this->stride;
 
     this->path = rand()%2;
     this->block = false;
@@ -38,7 +39,9 @@ Conehead::Conehead() {
     this->damage = 1;
     this->speed = zombie_table[this->type].speed;
     this->counter = this->speed;
-    this->scounter = zombie_table[this->type].stride;
+    this->stride = zombie_table[this->type].stride;
+    this->scounter = this->stride;
 
     this->path = rand()%2;
+    this->block = false;
 }

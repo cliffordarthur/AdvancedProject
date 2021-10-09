@@ -5,6 +5,7 @@
 #include <time.h>
 #include <assert.h>
 #include <string.h>
+#include <unistd.h>
 
 // the map has 4 lines and 4 columns
 // the length of grid is 10 units 
@@ -17,7 +18,7 @@
 // require at least R_LINES lines and R_COLS columns
 // R_LINES > MAP_LINE * (5+1) + SHOP_LINE + INFO_LINE
 // R_COLS > MAP_COL * (20+1)
-#define R_LINES 50
+#define R_LINES 45
 #define R_COLS 100
 
 // some keys in curses
@@ -44,6 +45,8 @@
 #define BLUE_BLACK 4
 
 #define ZOMBIE_NUM 3
+
+#define WIN_SEC 120
 
 enum Plantname{shovel, sunflower, wallnut, spikeweed, pumpkin};//TODO: peashooter, cherrybomb, snowpea
 
