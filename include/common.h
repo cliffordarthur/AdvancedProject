@@ -38,11 +38,14 @@
     printw(format, ## __VA_ARGS__);\
     attroff(COLOR_PAIR(color));} while(0);\
 
-#define WHITE_BLACK 0
-#define RED_BLACK 1
-#define GREEN_BLACK 2
-#define YELLOW_BLACK 3
-#define BLUE_BLACK 4
+// #define WHITE_BLACK 0
+// #define RED_BLACK 1
+// #define GREEN_BLACK 2
+// #define YELLOW_BLACK 3
+// #define BLUE_BLACK 4
+// #define MAGENTA_BLACK 5
+// #define CYAN_BLACK 6
+enum COLORS{WHITE_BLACK, RED_BLACK, GREEN_BLACK, YELLOW_BLACK, BLUE_BLACK, MAGENTA_BLACK, CYAN_BLACK};
 
 #define ZOMBIE_NUM 3
 
@@ -51,3 +54,7 @@
 enum Plantname{shovel, sunflower, wallnut, spikeweed, pumpkin};//TODO: peashooter, cherrybomb, snowpea
 
 enum Zombiename{zombie, conehead};//TODO: polevault, newspaper, ...
+
+enum Directions{diup, didown, dileft, diright, diend};
+
+enum Grid_type{melle, remote};

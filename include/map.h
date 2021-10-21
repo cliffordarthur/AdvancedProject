@@ -4,6 +4,7 @@
 #include "zombie.h"
 
 class Grid{
+    int type; /*melle or remote grids*/
     int x, y;
     Plant *plant_0;
     Plant *plant_p;
@@ -14,6 +15,7 @@ class Grid{
     Zombies *zombies[ZOMBIE_NUM];
 public:
     Grid();
+    void set_type(int t){type = t;}
     void set_coordinate(int x0, int y0);
     bool can_plant(int c);
     void add_plant(int c);
@@ -26,8 +28,15 @@ public:
     friend class Map;
 };
 
+struct Path{
+    int type;
+    int x, y;
+    int direction;
+};
+
 class Map{
     Grid grids[MAP_LINE][MAP_COL];
+    Path path[128];
 public:
     bool can_buy;
     Map();
