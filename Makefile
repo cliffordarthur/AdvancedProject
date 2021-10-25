@@ -8,7 +8,7 @@ obj = $(src:./src/%.cpp=$(build_dir)/%.o)
 $(prom): $(obj) $(build_dir)
 	@$(cc) -o $(prom) $(obj) -lcurses
 
-.PHONY: run clean
+.PHONY: run clean count
 run: $(obj)
 	@$(cc) -o $(prom) $(obj) -lcurses && $(prom)
 
@@ -19,3 +19,6 @@ $(build_dir)/%.o: ./src/%.cpp $(deps)
 clean: 
 	rm -rf $(build_dir)
 	@rm -rf ./.vscode
+
+count:
+	@echo $(shell find ./ -name "*.h" -or -name "*.cpp" |xargs cat|grep -v ^$$|wc -l)
