@@ -28,4 +28,5 @@ public:
     // bool check_lose();
     void show_info();
     void show_help();
+    int read_map(int choice);
 };

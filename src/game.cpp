@@ -8,7 +8,7 @@ Game::Game() {
     cursor_y = 0;
     lose = false;
     esc = false;
-    time_counter = 0;
+    time_counter = 0; 
 }
 
 void Game::init() {
@@ -18,7 +18,7 @@ void Game::init() {
     keypad(stdscr, true);
     noecho();
     curs_set(0);
-
+    
     if (!has_colors()) {
         endwin();
         printf("Your terminal doesn't support color\n");
@@ -102,13 +102,13 @@ void Game::input(char ch) {
             break;
         }
         case KEYENTER: {
-            if (map.grids[cursor_x][cursor_y].can_plant(shop.show_cart())){
+            if (map.grids[cursor_x*MAP_COL+cursor_y].can_plant(shop.show_cart())){
                 if (shop.show_cart()!=shovel){
-                    map.grids[cursor_x][cursor_y].add_plant(shop.show_cart());
+                    map.grids[cursor_x*MAP_COL+cursor_y].add_plant(shop.show_cart());
                     sun -= shop.buy();
                 }
                 else {
-                    int r = map.grids[cursor_x][cursor_y].use_shovel();
+                    int r = map.grids[cursor_x*MAP_COL+cursor_y].use_shovel();
                     sun += (shop.ret_sun(r)+shop.buy());
                 }
             }
@@ -144,13 +144,13 @@ void Game::gen_zombie() {
         switch (type) {
             case zombie: {
                 Zombie *z = new Zombie;
-                flag = map.grids[MAP_LINE-1][MAP_COL-1].add_zombie(z);
+                flag = map.grids[(MAP_LINE-1)*MAP_COL+MAP_COL-1].add_zombie(z);
                 if (!flag) delete z;
                 break;
             }
             case conehead: {
                 Conehead *z = new Conehead;
-                flag = map.grids[MAP_LINE-1][MAP_COL-1].add_zombie(z);
+                flag = map.grids[(MAP_LINE-1)*MAP_COL+MAP_COL-1].add_zombie(z);
                 if (!flag) delete z;
                 break;
             }
@@ -219,18 +219,76 @@ void Game::show_result() {
     else printf("You win the game, and your score is %d\n", score);
 }
 
+int Game::read_map(int choice) {
+    FILE *fp;
+    if (choice==0) fp = fopen("src/map/map.txt", "r");
+    else fp = fopen("src/map/map_1.txt", "r");
+    if (!fp) return -1;
+    
+    fscanf(fp, "%d", &MAP_LINE);
+    fscanf(fp, "%d", &MAP_COL);
+    fscanf(fp, "%d", &g_path_num);
+    
+    if (!(MAP_LINE>0 && MAP_COL>0 && g_path_num>0)) return -2;
+    for (int i = 0; i < g_path_num; i++) {
+        int tmpx, tmpy, tmpd;
+        char name[6];
+        bool flag = true;
+        Path *p = nullptr;
+
+        while (flag) {         
+            fscanf(fp, "%d", &tmpx);
+            fscanf(fp, "%d", &tmpy);
+            fscanf(fp, "%5s", name);
+                    
+            if (!(tmpx>=0 && tmpx<MAP_LINE && tmpy>=0 && tmpy<MAP_COL)) return -3;
+            if (p) {
+                switch (p->direction) {
+                    case    diup: if (!(p->x > tmpx && p->y == tmpy)) return -3; break;
+                    case  didown: if (!(p->x < tmpx && p->y == tmpy)) return -3; break;
+                    case  dileft: if (!(p->y > tmpy && p->x == tmpx)) return -3; break;
+                    case diright: if (!(p->y < tmpy && p->x == tmpx)) return -3; break;
+                    default: return -3;
+                }
+            }
+            
+            if (strcmp(name, "up")==0) tmpd=diup;
+            else if (strcmp(name, "down")==0) tmpd=didown;
+            else if (strcmp(name, "left")==0) tmpd=dileft;
+            else if (strcmp(name, "right")==0) tmpd=diright;
+            else if (strcmp(name, "end")==0) {tmpd=diend; flag=false;}
+            else return -3;
+
+            Path *q = new Path(tmpx, tmpy, tmpd, nullptr);
+            if (!p) {
+                map.g_path[i] = q;
+                p = map.g_path[i];
+            }
+            else {
+                p->next = q;
+                p = q;
+            }
+        }
+    }
+    fclose(fp);
+    return 0;
+}
+
 void Game::start() {
     show_help();
-
     char ch = 0;
+    int map_choice = 0;
     while(ch != KEYENTER){
         ch = getch();
+        if (ch==KEYESC) {endwin();return;}
+        if (ch=='1') map_choice = 1;
+        if (ch=='0') map_choice = 0;
     }
+    int flag = read_map(map_choice);
+    if(flag<0) {endwin();printf("%d bad idea %d\n", map_choice, flag);return;}//TODO: MORE
+
     refresh_map();
     begin = clock(), now = clock();
-
-    // Zombie* zz = new Zombie;
-    // map.grids[3][3].add_zombie(zz);
 
     while(!lose&&!esc&&(time_counter<=FPS*WIN_SEC)) {
         time_counter++;

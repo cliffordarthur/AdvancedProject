@@ -29,17 +29,21 @@ public:
 };
 
 struct Path{
-    int type;
     int x, y;
     int direction;
+    Path* next;
+    
+    Path(const int& x = 0, const int& y = 0, const int& direction = 0, Path* next = nullptr):
+        x(x), y(y), direction(direction), next(next) {}
 };
 
 class Map{
-    Grid grids[MAP_LINE][MAP_COL];
-    Path path[128];
+    std::vector<Grid> grids;
+    std::vector<Path*> g_path;
 public:
     bool can_buy;
     Map();
+    ~Map();
     void update(int& sun, bool& lose, int& score);
     void draw(int cursor_x, int cursor_y);
     bool find_enemy(bool is_plant, int r, int x, int y);

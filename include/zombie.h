@@ -22,6 +22,7 @@ protected:
     int damage, speed, stride; 
     int counter, scounter;
     int path;
+    int direction;
 public:
     Zombies(){}
     bool find_plant;
@@ -35,7 +36,8 @@ public:
     int show_path()const {return path;}
     
     void be_attacked(int h){HP-=h; if (HP<0) HP=0;}
-    // int show_s()const{return scounter;} 
+
+    int cross_grid(int i, int j);
 };
 
 class Zombie:public Zombies{

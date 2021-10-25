@@ -7,11 +7,16 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <iostream>
+#include <vector>
+// using namespace std;
+
 // the map has 4 lines and 4 columns
 // the length of grid is 10 units 
 // displayed as 5*20(long name)
-#define MAP_LINE 4
-#define MAP_COL 4
+extern int MAP_LINE;
+extern int MAP_COL;
+extern int g_path_num;
 #define GRID_LEN 20
 #define GRID_HEI 5
 
@@ -38,18 +43,11 @@
     printw(format, ## __VA_ARGS__);\
     attroff(COLOR_PAIR(color));} while(0);\
 
-// #define WHITE_BLACK 0
-// #define RED_BLACK 1
-// #define GREEN_BLACK 2
-// #define YELLOW_BLACK 3
-// #define BLUE_BLACK 4
-// #define MAGENTA_BLACK 5
-// #define CYAN_BLACK 6
 enum COLORS{WHITE_BLACK, RED_BLACK, GREEN_BLACK, YELLOW_BLACK, BLUE_BLACK, MAGENTA_BLACK, CYAN_BLACK};
 
-#define ZOMBIE_NUM 3
+#define ZOMBIE_NUM 30
 
-#define WIN_SEC 120
+#define WIN_SEC 180
 
 enum Plantname{shovel, sunflower, wallnut, spikeweed, pumpkin};//TODO: peashooter, cherrybomb, snowpea
 
