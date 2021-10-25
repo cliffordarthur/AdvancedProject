@@ -26,7 +26,6 @@ protected:
 public:
     Zombies(){}
     bool find_plant;
-    bool block;
     void cooldown();
     int attack()const{return damage;}
     int walk();
@@ -38,6 +37,7 @@ public:
     void be_attacked(int h){HP-=h; if (HP<0) HP=0;}
 
     int cross_grid(int i, int j);
+    void set_direction(int d){direction = d;}
 };
 
 class Zombie:public Zombies{

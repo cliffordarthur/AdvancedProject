@@ -83,8 +83,10 @@ void Map::update(int& sun, bool& lose, int& score) {
             }
             
             if (grids[i*MAP_COL+j].z_num) {
-                for (int k = 0; k < ZOMBIE_NUM; k++) {
+                int tmp_z_num = grids[i*MAP_COL+j].z_num;
+                for (int k = 0, zz = 0; k < ZOMBIE_NUM && zz < tmp_z_num; k++) {
                     if (!grids[i*MAP_COL+j].zombies[k]) continue;
+                    zz++;
                     if (grids[i*MAP_COL+j].zombies[k]->show_HP() <= 0) {
                         score += zombie_table[grids[i*MAP_COL+j].zombies[k]->show_type()].score;
                         grids[i*MAP_COL+j].free_zombie(k);
@@ -101,22 +103,17 @@ void Map::update(int& sun, bool& lose, int& score) {
                                         if (ready) {
                                             int next = grids[i*MAP_COL+j].zombies[k]->cross_grid(i, j);
                                             if (next<0) {lose = true; return;}
-                                            // int ni, nj;
-                                            // if (grids[i*MAP_COL+j].zombies[k]->show_path()==0) {                                                
-                                            //     if (i == MAP_LINE-1 && j != 0) {ni = i; nj = j-1;}   
-                                            //     else if (j == 0 && i != 0) {ni = i-1; nj = j;}
-                                            //     else {lose = true; return;}                                                
-                                            // }
-                                            // else if (grids[i*MAP_COL+j].zombies[k]->show_path()==1) {
-                                            //     if (i != 0 && j == MAP_COL-1) {ni = i-1; nj = j;}
-                                            //     else if (j != 0 && i == 0) {ni = i; nj = j-1;}
-                                            //     else {lose = true; return;}
-                                            // }
-                                            bool b = grids[next].add_zombie(grids[i*MAP_COL+j].zombies[k]);
-                                            if (b) {
-                                                grids[i*MAP_COL+j].del_zombie(k);
+                                            Path *p = g_path[grids[i*MAP_COL+j].zombies[k]->show_path()];
+                                            while (p) {
+                                                if (p->x*MAP_COL+p->y==next) {
+                                                    grids[i*MAP_COL+j].zombies[k]->set_direction(p->direction);
+                                                    break;
+                                                }
+                                                p = p->next;
                                             }
-                                            else {grids[i*MAP_COL+j].zombies[k]->block = !b;}
+                                            grids[next].add_zombie(grids[i*MAP_COL+j].zombies[k]);
+                                            grids[i*MAP_COL+j].del_zombie(k);
+                                            
                                         }
                                     }
                                     else {

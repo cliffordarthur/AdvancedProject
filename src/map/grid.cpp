@@ -75,18 +75,16 @@ int Grid::use_shovel(int c) {
     return c;
 }
 
-bool Grid::add_zombie(Zombies *z){
+void Grid::add_zombie(Zombies *z){
     if (z_num < ZOMBIE_NUM) {
         z_num++; 
         for (int i = 0; i < ZOMBIE_NUM; i++) {
             if (this->zombies[i]==NULL){
-                z->block = false;
                 this->zombies[i] = z;
-                return true;
+                return;
             }
         }
     }
-    return false;
 }
 
 void Grid::del_zombie(int z) {

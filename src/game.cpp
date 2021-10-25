@@ -131,7 +131,6 @@ void Game::input(char ch) {
 void Game::gen_sun() {
     if (!(time_counter % (8*FPS))) {
         sun += (10+rand()%40);
-        // time_counter = 0;
     }
 }
 
@@ -144,14 +143,14 @@ void Game::gen_zombie() {
         switch (type) {
             case zombie: {
                 Zombie *z = new Zombie;
-                flag = map.grids[(MAP_LINE-1)*MAP_COL+MAP_COL-1].add_zombie(z);
-                if (!flag) delete z;
+                z->set_direction(map.g_path[z->show_path()]->direction);
+                map.grids[(MAP_LINE-1)*MAP_COL+MAP_COL-1].add_zombie(z);          
                 break;
             }
             case conehead: {
                 Conehead *z = new Conehead;
-                flag = map.grids[(MAP_LINE-1)*MAP_COL+MAP_COL-1].add_zombie(z);
-                if (!flag) delete z;
+                z->set_direction(map.g_path[z->show_path()]->direction);
+                map.grids[(MAP_LINE-1)*MAP_COL+MAP_COL-1].add_zombie(z);
                 break;
             }
             default: break;
@@ -171,7 +170,7 @@ void Game::show_help() {
     printc(WHITE_BLACK, "In the game, you can use the keyboard to buy plants and plant them to a certain area of the map\n"\
         "to resist the attack of zombies.\n\n"\
         "The victory condition is to persist for ");
-    printc(YELLOW_BLACK, "two minites")
+    printc(YELLOW_BLACK, "three minites")
     printc(WHITE_BLACK, ", so that the zombie does not reach the end\n of the path.\n\n");
 
     printc(WHITE_BLACK, "You can press the ");

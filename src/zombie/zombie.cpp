@@ -6,18 +6,12 @@ void Zombies::cooldown() {
 }
 
 int Zombies::walk() {
-    // path: 
-    // 0: RD->LD->LU
-    // 1: RD->RU->LU
-    if (!block) {
-        scounter--;
-        if (scounter==0) {
-            scounter = stride;
-            return 1;
-        }
-        return 0;
+    scounter--;
+    if (scounter==0) {
+        scounter = stride;
+        return 1;
     }
-    return 1;// when blocked, always ready to get to another grid
+    return 0;
 }
 
 int Zombies::cross_grid(int i, int j) {
@@ -43,7 +37,7 @@ Zombie::Zombie() {
     this->scounter = this->stride;
 
     this->path = rand()%g_path_num;
-    this->block = false;
+    this->direction = 0;
 }
 
 Conehead::Conehead() {
@@ -56,5 +50,5 @@ Conehead::Conehead() {
     this->scounter = this->stride;
 
     this->path = rand()%g_path_num;
-    this->block = false;
+    this->direction = 0;
 }

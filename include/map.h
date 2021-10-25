@@ -22,7 +22,7 @@ public:
     int use_shovel();
     int use_shovel(int c);
 
-    bool add_zombie(Zombies* z);
+    void add_zombie(Zombies* z);
     void del_zombie(int z);
     void free_zombie(int z);
     friend class Map;
