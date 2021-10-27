@@ -10,8 +10,33 @@ int get_digits(int num) {
     return d;
 }
 
-Map::Map():grids(MAP_LINE*MAP_COL), g_path(g_path_num, nullptr) {
+Map::~Map() {
+    for (int i = 0; i < g_path_num; i++) {
+        if (!g_path.size()) break;
+        while (g_path[i]) {
+            Path *p = g_path[i];
+            g_path[i] = g_path[i]->next;
+            delete p;
+        }
+    }
+    for (int i = 0; i < a_path_num; i++) {
+        if (!a_path.size()) break;
+        while (a_path[i]) {
+            Path *p = a_path[i];
+            a_path[i] = a_path[i]->next;
+            delete p;
+        }
+    }
+}
+
+void Map::set_Map(){
     can_buy = true;
+    spec_type = -1;
+    spec_coord = -1;
+    grids.resize(MAP_LINE*MAP_COL);
+    g_path.resize(g_path_num, nullptr);
+    a_path.resize(a_path_num, nullptr);
+
     for (int i = 0; i < MAP_LINE; i++) {
         for (int j = 0; j < MAP_COL; j++) {
             grids[i*MAP_COL+j].set_coordinate(i, j);
@@ -19,8 +44,19 @@ Map::Map():grids(MAP_LINE*MAP_COL), g_path(g_path_num, nullptr) {
     }
 }
 
-Map::~Map() {
-    //FIXME: delete grids & g_paths
+void Map::set_type(int t, int x1, int y1, int x2, int y2){
+    int s, l;
+    if (x1==x2) {
+        s = (y1<y2)?y1:y2;
+        l = (y1>y2)?y1:y2;
+        for (int i = s; i <= l; i++) grids[x1*MAP_COL+i].set_type(t);
+    }
+    else if (y1==y2) {
+        s = (x1<x2)?x1:x2;
+        l = (x1>x2)?x1:x2;
+        for (int i = s; i <= l; i++) grids[i*MAP_COL+y1].set_type(t);
+    }
+    else assert(0);
 }
 
 bool Map::find_enemy(bool is_plant, int r, int x, int y){

@@ -210,7 +210,7 @@ void Game::show_result() {
     printc(YELLOW_BLACK, "%d", score);
 
     refresh();
-    sleep(5);
+    sleep(1);
     endwin();
     
     if (lose) printf("You lost the game, and your score is %d\n", score);
@@ -227,9 +227,11 @@ int Game::read_map(int choice) {
     fscanf(fp, "%d", &MAP_LINE);
     fscanf(fp, "%d", &MAP_COL);
     fscanf(fp, "%d", &g_path_num);
-    
-    if (!(MAP_LINE>0 && MAP_COL>0 && g_path_num>0)) return -2;
-    for (int i = 0; i < g_path_num; i++) {
+    fscanf(fp, "%d", &a_path_num);
+    map.set_Map();
+
+    if (!(MAP_LINE>0 && MAP_COL>0 && g_path_num>0 && a_path_num>=0)) return -2;
+    for (int i = 0; i < g_path_num + a_path_num; i++) {
         int tmpx, tmpy, tmpd;
         char name[6];
         bool flag = true;
@@ -260,8 +262,15 @@ int Game::read_map(int choice) {
 
             Path *q = new Path(tmpx, tmpy, tmpd, nullptr);
             if (!p) {
-                map.g_path[i] = q;
-                p = map.g_path[i];
+                if (i<g_path_num) {
+                    map.grids[tmpx*MAP_LINE+tmpy].set_type(g_z_base);
+                    map.g_path[i] = q;
+                    p = map.g_path[i];
+                }
+                else {
+                    map.a_path[i-g_path_num] = q;
+                    p = map.a_path[i-g_path_num];
+                }
             }
             else {
                 p->next = q;
@@ -269,6 +278,51 @@ int Game::read_map(int choice) {
             }
         }
     }
+    
+    char buf[10];
+    fscanf(fp, "%9s", buf);
+    if (strcmp(buf, "pvz") && strcmp(buf, "default") && strcmp(buf, "melle") && strcmp(buf, "remote")) {
+        return -4;
+    }
+    if (strcmp(buf, "pvz")==0) {
+        for (int i = 0; i < MAP_LINE; i++) {
+            for (int j = 0; j < MAP_COL; j++) {
+                map.grids[i*MAP_COL+j].set_type(mr);
+            }
+        }
+    }
+    else {
+        for (int i = 0; i < g_path_num; i++) {
+            Path *p = map.g_path[i];
+            while (p && p->next) {
+                map.set_type(melle, p->x, p->y, p->next->x, p->next->y);
+                p = p->next;
+            }
+        }
+    }
+    while (strcmp(buf, "melle")==0 || strcmp(buf, "remote")==0) {
+        int tmpx, tmpy;
+        fscanf(fp, "%d", &tmpx);
+        fscanf(fp, "%d", &tmpy);
+        if (strcmp(buf, "melle")) {map.grids[tmpx*MAP_COL+tmpy].set_type(melle);}
+        else {map.grids[tmpx*MAP_COL+tmpy].set_type(remote);}
+        fscanf(fp, "%9s", buf);
+    }
+
+    fscanf(fp, "%9s", buf);
+    if (strcmp(buf, "fort")==0) {
+        int fx, fy;
+        fscanf(fp, "%d", &fx);
+        fscanf(fp, "%d", &fy);
+        map.spec_type = fort;
+        map.spec_coord = fx*MAP_COL+fy;
+    }
+    else if (strcmp(buf, "none")==0) {}
+    else return -5;
+
+    fscanf(fp, "%9s", buf);
+    if (strcmp(buf, "endfile")) fclose(fp);
+
     fclose(fp);
     return 0;
 }

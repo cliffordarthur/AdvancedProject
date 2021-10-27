@@ -17,6 +17,7 @@
 extern int MAP_LINE;
 extern int MAP_COL;
 extern int g_path_num;
+extern int a_path_num;
 #define GRID_LEN 20
 #define GRID_HEI 5
 
@@ -55,4 +56,6 @@ enum Zombiename{zombie, conehead};//TODO: polevault, newspaper, ...
 
 enum Directions{diup, didown, dileft, diright, diend};
 
-enum Grid_type{melle, remote};
+enum Grid_type{melle, remote, mr, g_z_base};
+
+enum Spec_type{fort};

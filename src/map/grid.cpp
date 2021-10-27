@@ -6,7 +6,7 @@ Grid::Grid(){
     has_pumpkin = false;
     p_num = 0;
     z_num = 0;
-
+    type = remote;
     for (int i = 0; i < ZOMBIE_NUM; i++) zombies[i] = NULL;
 }
 
