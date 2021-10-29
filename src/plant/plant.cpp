@@ -12,6 +12,7 @@ Sunflower::Sunflower() {
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;
     this->attacked = plant_table[this->type].attacked;
+    this->p_type = plant_table[this->type].p_type;
     this->find_zombie = false;
 
     this->sun = 10;
@@ -29,6 +30,7 @@ Wallnut::Wallnut() {
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;
     this->attacked = plant_table[this->type].attacked;
+    this->p_type = plant_table[this->type].p_type;
     this->find_zombie = false;
 }
 
@@ -39,6 +41,7 @@ Spikeweed::Spikeweed() {
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;
     this->attacked = plant_table[this->type].attacked;
+    this->p_type = plant_table[this->type].p_type;
     this->find_zombie = false;
 
     this->counter = this->speed;
@@ -51,5 +54,6 @@ Pumpkin::Pumpkin() {
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;
     this->attacked = plant_table[this->type].attacked;
+    this->p_type = plant_table[this->type].p_type;
     this->find_zombie = false;
 }

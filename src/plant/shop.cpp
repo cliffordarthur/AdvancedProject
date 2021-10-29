@@ -8,7 +8,7 @@ Shop::Shop(){
     cart = -1;
     fail_to_cart = -1;
     for (int i = 0; i < plant_num; i++) {
-        menu[i].menu_set(i, plant_table[i].costs, plant_table[i].CDtime);
+        menu[i].menu_set(i, plant_table[i].costs, plant_table[i].CDtime, plant_table[i].p_type);
     }
 }
 
@@ -33,15 +33,19 @@ int Shop::ret_sun(int r) {
 }
 
 void Shop::update() {
-    printc(WHITE_BLACK, "===========================================");
+    printnc(MAP_COL*(GRID_LEN+1)/2-2, WHITE_BLACK, "=");
     printc(YELLOW_BLACK, "SHOP");
-    printc(WHITE_BLACK, "===========================================\n");
+    printnc(MAP_COL*(GRID_LEN+1)/2-2, WHITE_BLACK, "=");
+    printc(WHITE_BLACK, "\n");
 
     for (int i = 1; i < plant_num; i++){
         menu[i].cooldown();
-        if (i==cart) {printc(YELLOW_BLACK, "%d\t%s\t%d\t%d\n", i, plant_table[i].name, menu[i].costs, menu[i].counter/FPS);}
-        else if (i==fail_to_cart) {printc(RED_BLACK, "%d\t%s\t%d\t%d\n", i, plant_table[i].name, menu[i].costs, menu[i].counter/FPS);fail_to_cart=-1;}
-        else printc(GREEN_BLACK, "%d\t%s\t%d\t%d\n", i, plant_table[i].name, menu[i].costs, menu[i].counter/FPS);
+        if (i==cart) {printc(YELLOW_BLACK, "%d\t%s\t%d\t%d", i, plant_table[i].name, menu[i].costs, menu[i].counter/FPS);}
+        else if (i==fail_to_cart) {printc(RED_BLACK, "%d\t%s\t%d\t%d", i, plant_table[i].name, menu[i].costs, menu[i].counter/FPS);fail_to_cart=-1;}
+        else printc(GREEN_BLACK, "%d\t%s\t%d\t%d", i, plant_table[i].name, menu[i].costs, menu[i].counter/FPS);
+        
+        if (i%2) {printnc(MAP_COL*(1+GRID_LEN)/3, WHITE_BLACK, " ");}
+        else {printw("\n");}
     }
     if (cart==0) {printc(YELLOW_BLACK, "%d\t%s\n", 0, plant_table[0].name);}
     else printc(GREEN_BLACK, "%d\t%s\n", 0, plant_table[0].name);

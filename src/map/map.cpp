@@ -10,7 +10,16 @@ int get_digits(int num) {
     return d;
 }
 
+
+
 Map::~Map() {
+    // for (int i = 0; i < MAP_LINE; i++) {
+    //     for (int j = 0; j  <MAP_COL; j++) {
+    //         std::cout<<grids[i*MAP_COL+j].show_type()<<" ";
+    //     }
+    //     std::cout<<"\n";
+    // }
+    
     for (int i = 0; i < g_path_num; i++) {
         if (!g_path.size()) break;
         while (g_path[i]) {
@@ -59,7 +68,7 @@ void Map::set_type(int t, int x1, int y1, int x2, int y2){
     else assert(0);
 }
 
-bool Map::find_enemy(bool is_plant, int r, int x, int y){
+bool Map::find_enemy(bool is_plant, int r, int x, int y){//FIXME: 
     if (is_plant) {
         for (int i = 0; i < MAP_LINE; i++) {
             for (int j = 0; j < MAP_COL; j++) {
@@ -80,6 +89,9 @@ bool Map::find_enemy(bool is_plant, int r, int x, int y){
 void Map::update(int& sun, bool& lose, int& score) {
     for (int i = 0; i < MAP_LINE; i++) { 
         for (int j = 0; j < MAP_COL; j++) {
+            if (spec_type==fort && spec_coord==i*MAP_COL+j && grids[i*MAP_COL+j].plant_p->show_HP() <= 0) {
+                spec_type = d_fort;
+            }
             if (grids[i*MAP_COL+j].plant_p) {
                 if (grids[i*MAP_COL+j].plant_p->show_HP() <= 0) {
                     grids[i*MAP_COL+j].use_shovel();
@@ -128,6 +140,7 @@ void Map::update(int& sun, bool& lose, int& score) {
                         grids[i*MAP_COL+j].free_zombie(k);
                     }
                     else {
+                        if (spec_type==d_fort) {grids[i*MAP_COL+j].zombies[k]->get_crazy();}
                         grids[i*MAP_COL+j].zombies[k]->find_plant = find_enemy(false, 0, i, j);
                         grids[i*MAP_COL+j].zombies[k]->cooldown();
                         switch (grids[i*MAP_COL+j].zombies[k]->show_type()) {
@@ -169,23 +182,33 @@ void Map::update(int& sun, bool& lose, int& score) {
 }
 
 void Map::draw(int cursor_x, int cursor_y) {
-    printc(WHITE_BLACK, "===========================================");
+    printnc(MAP_COL*(GRID_LEN+1)/2-2, WHITE_BLACK, "=");
     printc(YELLOW_BLACK, "MAP");
-    printc(WHITE_BLACK, "============================================\n\n");
+    printnc(MAP_COL*(GRID_LEN+1)/2-1, WHITE_BLACK, "=");
+    printc(WHITE_BLACK, "\n\n");
 
     for (int mapline = 0; mapline <= MAP_LINE; mapline++){
-        if ((mapline != cursor_x) && (mapline != (cursor_x+1))) {
-            for (int i = 0; i <= MAP_COL*(1+GRID_LEN); i++) printw("+");
+        for (int i = 0, ii; i <= MAP_COL * (1 + GRID_LEN); i++) {
+            if ((mapline==cursor_x || mapline==cursor_x+1) && cursor_y*(1+GRID_LEN)<=i && i<=(1+cursor_y)*(1+GRID_LEN)) {
+                if (!can_buy) {printc(RED_BLACK, "+");}
+                else printc(YELLOW_BLACK, "+");
+            }
+            else if (i%(1+GRID_LEN)==0) {
+                int j = i/(1+GRID_LEN);
+                if (((mapline < MAP_LINE) && (j < MAP_COL) && (grids[mapline*MAP_COL+j].show_type() != remote)) || 
+                    ((mapline < MAP_LINE) && (j > 0) && (grids[mapline*MAP_COL+j-1].show_type() != remote))     ||
+                    ((mapline > 0) && (j < MAP_COL) && (grids[(mapline-1)*MAP_COL+j].show_type() != remote))    ||
+                    ((mapline > 0) && (j > 0) && (grids[(mapline-1)*MAP_COL+j-1].show_type() != remote))){
+                    printc(GREEN_BLACK, "+");}
+                else printc(WHITE_BLACK, "+");
+            }
+            else if ((mapline<MAP_LINE) && (grids[mapline*MAP_COL+i/(1+GRID_LEN)].show_type()!=remote) ||
+              (mapline>0) && (grids[(mapline-1)*MAP_COL+i/(1+GRID_LEN)].show_type()!=remote)) {
+                printc(GREEN_BLACK, "+");
+            }
+            else printc(WHITE_BLACK, "+");
         }
-        else {
-            for (int i = 0; i <= MAP_COL*(1+GRID_LEN); i++) {
-                if (cursor_y*(1+GRID_LEN)<=i && i<=(1+cursor_y)*(1+GRID_LEN)) {
-                    if (!can_buy) {printc(RED_BLACK, "+");}
-                    else printc(YELLOW_BLACK, "+");
-                }
-                else printw("+");
-            }    
-        }
+
         printw("\n");
         if (mapline == MAP_LINE) break;
 
@@ -196,7 +219,11 @@ void Map::draw(int cursor_x, int cursor_y) {
                         if (!can_buy) {printc(RED_BLACK, "+");}
                         else printc(YELLOW_BLACK, "+");
                     }
-                    else printw("+");
+                    else if ((j > 0 && grids[mapline*MAP_COL+j/(1+GRID_LEN)-1].show_type()!=remote)||
+                             (j < MAP_COL*(1+GRID_LEN) && grids[mapline*MAP_COL+j/(1+GRID_LEN)].show_type()!=remote)) {
+                        printc(GREEN_BLACK, "+");
+                    }
+                    else printc(WHITE_BLACK, "+");
                 } // box
                 else if (j%(1+GRID_LEN)==1) {
                     int tmp_y = j/(1+GRID_LEN);

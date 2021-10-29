@@ -24,6 +24,7 @@ bool Grid::can_plant(int c) {
         if (has_pumpkin) return false;
     }
     else if ((!has_pumpkin && p_num == 1) || (p_num > 1)) return false;
+    else if ((type==melle && plant_table[c].p_type==p_remote) || (type==remote && plant_table[c].p_type==p_melle)) return false;
     return true;
 }
 
@@ -96,4 +97,23 @@ void Grid::free_zombie(int z) {
     delete zombies[z];
     zombies[z] = NULL;
     z_num--;
+}
+
+void Grid::add_fort() {
+    p_num++;
+    has_pumpkin = true;
+    Pumpkin *p = new Pumpkin;
+    p->be_attacked(-9*p->show_HP());
+    this->plant_p = p;
+}
+
+void Grid::cheat_kill() {
+    if (z_num) {
+        for (int i = 0, zz = 0; i < ZOMBIE_NUM && zz < z_num; i++) {
+            if (zombies[i]){
+                zz++;
+                zombies[i]->be_attacked(114514);
+            }
+        }
+    }
 }

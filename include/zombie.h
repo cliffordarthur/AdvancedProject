@@ -23,6 +23,7 @@ protected:
     int counter, scounter;
     int path;
     int direction;
+    bool crazy;
 public:
     Zombies(){}
     bool find_plant;
@@ -38,6 +39,7 @@ public:
 
     int cross_grid(int i, int j);
     void set_direction(int d){direction = d;}
+    void get_crazy(){if (!crazy) {crazy=true; speed/=2;}}
 };
 
 class Zombie:public Zombies{

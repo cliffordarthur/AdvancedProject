@@ -11,12 +11,13 @@ struct Planttable{
     int speed;//attack
     int range;
     bool attacked;
+    int p_type;
 }static plant_table[] = {
-    {"   shovel",    shovel,  1,   0,      0, 0,     0,  0, false},
-    {"sunflower", sunflower,  8,  50,  3*FPS, 0, 3*FPS, 99,  true},
-    {"  wallnut",   wallnut, 50,  75, 10*FPS, 0,     1,  0,  true},
-    {"spikeweed", spikeweed,  1, 100,  5*FPS, 1, 1*FPS,  0, false},
-    {"  pumpkin",   pumpkin, 50, 125, 12*FPS, 0,     1,  0,  true},
+    {"   shovel",    shovel,  1,   0,      0, 0,     0,  0, false, p_other},
+    {"sunflower", sunflower,  8,  50,  3*FPS, 0, 3*FPS, 99,  true, p_other},
+    {"  wallnut",   wallnut, 50,  75, 10*FPS, 0,     1,  0,  true, p_melle},
+    {"spikeweed", spikeweed,  1, 100,  5*FPS, 1, 1*FPS,  0, false, p_melle},
+    {"  pumpkin",   pumpkin, 50, 125, 12*FPS, 0,     1,  0,  true, p_other},
 
 };
 
@@ -29,6 +30,7 @@ protected:
     int damage, speed, range;
     int counter;
     bool attacked; //whether can be attacked
+    int p_type;
 public:
     Plant(){};
     bool find_zombie;
@@ -64,19 +66,15 @@ public:
     Pumpkin();
 };
 
-// class Shovel: public Plant{
-// public:
-//     Shovel(){};
-// };
-
 class Menu{
     int type;
     int costs, CDtime;
-    int counter;    
+    int counter; 
 public:
     Menu(){};
-    void menu_set(int t, int c, int cd){type = t; costs = c; CDtime = cd; counter = 0;}
+    void menu_set(int t, int c, int cd, int pt){type = t; costs = c; CDtime = cd; counter = 0;}
     void cooldown();
+    void no_CDtime() {CDtime = 0;}
     friend class Shop;
 };
 
@@ -92,5 +90,6 @@ public:
     int buy();
     int ret_sun(int r);
     void update();
+    void no_CDtime(){for (int i = 0; i < plant_num; i++) menu[i].no_CDtime();}
 };
 //TODO:

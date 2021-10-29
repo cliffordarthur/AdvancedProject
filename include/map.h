@@ -16,6 +16,7 @@ class Grid{
 public:
     Grid();
     void set_type(int t){if (type!=g_z_base) type = t;}
+    int show_type() const {return type;}
     void set_coordinate(int x0, int y0);
     bool can_plant(int c);
     void add_plant(int c);
@@ -25,6 +26,9 @@ public:
     void add_zombie(Zombies* z);
     void del_zombie(int z);
     void free_zombie(int z);
+
+    void add_fort();
+    void cheat_kill();
     friend class Map;
 };
 
@@ -52,5 +56,6 @@ public:
     void update(int& sun, bool& lose, int& score);
     void draw(int cursor_x, int cursor_y);
     bool find_enemy(bool is_plant, int r, int x, int y);
+    void cheat_kill() {for (int i = 0; i < grids.size(); i++) grids[i].cheat_kill();}
     friend class Game;
 };

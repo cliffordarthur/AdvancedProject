@@ -44,11 +44,18 @@ extern int a_path_num;
     printw(format, ## __VA_ARGS__);\
     attroff(COLOR_PAIR(color));} while(0);\
 
+inline void printnc(int n, int color, const char* s) {
+    while (n) {
+        printc(color, s);
+        n--;
+    }
+}
+
 enum COLORS{WHITE_BLACK, RED_BLACK, GREEN_BLACK, YELLOW_BLACK, BLUE_BLACK, MAGENTA_BLACK, CYAN_BLACK};
 
-#define ZOMBIE_NUM 30
+#define ZOMBIE_NUM 256
 
-#define WIN_SEC 180
+#define WIN_SEC 600
 
 enum Plantname{shovel, sunflower, wallnut, spikeweed, pumpkin};//TODO: peashooter, cherrybomb, snowpea
 
@@ -58,4 +65,7 @@ enum Directions{diup, didown, dileft, diright, diend};
 
 enum Grid_type{melle, remote, mr, g_z_base};
 
-enum Spec_type{fort};
+enum Plant_type{p_melle, p_remote, p_other};
+
+enum Spec_type{fort, d_fort};
+

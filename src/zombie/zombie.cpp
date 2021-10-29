@@ -38,6 +38,7 @@ Zombie::Zombie() {
 
     this->path = rand()%g_path_num;
     this->direction = 0;
+    this->crazy = false;
 }
 
 Conehead::Conehead() {
@@ -51,4 +52,5 @@ Conehead::Conehead() {
 
     this->path = rand()%g_path_num;
     this->direction = 0;
+    this->crazy = false;
 }

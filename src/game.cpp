@@ -37,7 +37,7 @@ void Game::init() {
     if ((LINES < R_LINES)||(COLS < R_COLS)) {
         endwin();
         printf("In order to display the graph completely, the length and width of your terminal "\
-            "should not be less than 100 and 45\n");
+            "should not be less than 170 and 52\n");
         exit(1);
     }
 }
@@ -48,14 +48,16 @@ void Game::wait() {
 }
 
 void Game::show_info() {
-    printc(WHITE_BLACK, "===========================================");
+    printnc(MAP_COL*(GRID_LEN+1)/2-2, WHITE_BLACK, "=");
     printc(YELLOW_BLACK, "INFO");
-    printc(WHITE_BLACK, "===========================================\n");
+    printnc(MAP_COL*(GRID_LEN+1)/2-2, WHITE_BLACK, "=");
+    printc(WHITE_BLACK, "\n");
     printc(WHITE_BLACK, "SUN:");
-    printc(YELLOW_BLACK, "%d\n", sun);
+    printc(YELLOW_BLACK, "%d", sun);
+    printnc(MAP_COL*(1+GRID_LEN)/3, WHITE_BLACK, " ");
     printc(WHITE_BLACK, "SCORE:");
-    printc(YELLOW_BLACK, "%d\n", score);
-
+    printc(YELLOW_BLACK, "%d", score);
+    printnc(MAP_COL*(1+GRID_LEN)/3, WHITE_BLACK, " ");
     printc(WHITE_BLACK, "TIME:");
     printc(YELLOW_BLACK, "%d\n", time_counter/FPS);
 }
@@ -73,19 +75,19 @@ void Game::refresh_map() {
 void Game::input(char ch) {
     switch (ch) {    
         case KEYUP: {
-            if (cursor_x>0) cursor_x--;
+            if (cursor_x && (map.grids[(cursor_x-1)*MAP_COL+cursor_y].show_type()!=g_z_base)) cursor_x--;
             break;
         }
         case KEYDOWN: {
-            if ((cursor_x<MAP_LINE-1)&&!(cursor_x==MAP_LINE-2 && cursor_y==MAP_COL-1)) cursor_x++;
+            if ((cursor_x < MAP_LINE-1) && (map.grids[(cursor_x+1)*MAP_COL+cursor_y].show_type()!=g_z_base)) cursor_x++;
             break;
         }
         case KEYLEFT: {
-            if (cursor_y>0) cursor_y--;
+            if (cursor_y && (map.grids[cursor_x*MAP_COL+cursor_y-1].show_type()!=g_z_base)) cursor_y--;
             break;
         }
         case KEYRIGHT: {
-            if ((cursor_y<MAP_COL-1)&&!(cursor_x==MAP_LINE-1 && cursor_y==MAP_COL-2)) cursor_y++;
+            if ((cursor_y < MAP_COL-1) && (map.grids[cursor_x*MAP_COL+cursor_y+1].show_type()!=g_z_base)) cursor_y++;
             break;
         }
         case '0':
@@ -123,7 +125,18 @@ void Game::input(char ch) {
             shop.clear_cart();
             break;
         }
-        case 'c':sun+=10000;break;
+        case 's': {
+            sun += 10000;
+            break;
+        }
+        case 'c':{
+            shop.no_CDtime();
+            break;
+        }
+        case 'k':{
+            map.cheat_kill();
+            break;
+        }
         default: break;
     }
 }
@@ -144,13 +157,13 @@ void Game::gen_zombie() {
             case zombie: {
                 Zombie *z = new Zombie;
                 z->set_direction(map.g_path[z->show_path()]->direction);
-                map.grids[(MAP_LINE-1)*MAP_COL+MAP_COL-1].add_zombie(z);          
+                map.grids[map.g_path[z->show_path()]->x*MAP_COL+map.g_path[z->show_path()]->y].add_zombie(z);
                 break;
             }
             case conehead: {
                 Conehead *z = new Conehead;
                 z->set_direction(map.g_path[z->show_path()]->direction);
-                map.grids[(MAP_LINE-1)*MAP_COL+MAP_COL-1].add_zombie(z);
+                map.grids[map.g_path[z->show_path()]->x*MAP_COL+map.g_path[z->show_path()]->y].add_zombie(z);
                 break;
             }
             default: break;
@@ -167,17 +180,17 @@ void Game::check() {
 
 void Game::show_help() {
     printc(YELLOW_BLACK, "HELP\n\n");
-    printc(WHITE_BLACK, "In the game, you can use the keyboard to buy plants and plant them to a certain area of the map\n"\
+    printc(WHITE_BLACK, "In the game, you can use the keyboard to buy plants and plant them to a certain area of the map"\
         "to resist the attack of zombies.\n\n"\
         "The victory condition is to persist for ");
-    printc(YELLOW_BLACK, "three minites")
-    printc(WHITE_BLACK, ", so that the zombie does not reach the end\n of the path.\n\n");
+    printc(YELLOW_BLACK, "ten minites")
+    printc(WHITE_BLACK, ", so that the zombie does not reach the end of the path.\n\n");
 
     printc(WHITE_BLACK, "You can press the ");
     printc(YELLOW_BLACK, "number keys ");
     printc(WHITE_BLACK, "to select plants, use the ");
     printc(YELLOW_BLACK, "arrow keys ");
-    printc(WHITE_BLACK, "to select the area to be\nplanted, and then press ");
+    printc(WHITE_BLACK, "to select the area to be planted, and then press ");
     printc(YELLOW_BLACK, "Enter ");
     printc(WHITE_BLACK, "to purchase or press ");
     printc(YELLOW_BLACK, "Space ");
@@ -197,7 +210,9 @@ void Game::show_help() {
     printc(YELLOW_BLACK, "ESC ");
     printc(WHITE_BLACK, "to quit.\n\n");
 
-    printc(WHITE_BLACK, "Now, press ");
+    printc(WHITE_BLACK, "Now, you can press ");
+    printc(YELLOW_BLACK, "1 ");
+    printc(WHITE_BLACK, "to use the custom map or press nothing to use the default map. Then press ")
     printc(YELLOW_BLACK, "ENTER ");
     printc(WHITE_BLACK, "to start.\n");
 }
@@ -263,7 +278,7 @@ int Game::read_map(int choice) {
             Path *q = new Path(tmpx, tmpy, tmpd, nullptr);
             if (!p) {
                 if (i<g_path_num) {
-                    map.grids[tmpx*MAP_LINE+tmpy].set_type(g_z_base);
+                    map.grids[tmpx*MAP_COL+tmpy].set_type(g_z_base);
                     map.g_path[i] = q;
                     p = map.g_path[i];
                 }
@@ -316,6 +331,7 @@ int Game::read_map(int choice) {
         fscanf(fp, "%d", &fy);
         map.spec_type = fort;
         map.spec_coord = fx*MAP_COL+fy;
+        map.grids[map.spec_coord].add_fort();
     }
     else if (strcmp(buf, "none")==0) {}
     else return -5;
