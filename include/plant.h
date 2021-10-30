@@ -10,15 +10,17 @@ struct Planttable{
     int damage;
     int speed;//attack
     int range;
-    bool attacked;
+    bool attacked;//FIXME: in zombies
     int p_type;
 }static plant_table[] = {
-    {"   shovel",    shovel,  1,   0,      0, 0,     0,  0, false, p_other},
-    {"sunflower", sunflower,  8,  50,  3*FPS, 0, 3*FPS, 99,  true, p_other},
-    {"  wallnut",   wallnut, 50,  75, 10*FPS, 0,     1,  0,  true, p_melle},
-    {"spikeweed", spikeweed,  1, 100,  5*FPS, 1, 1*FPS,  0, false, p_melle},
-    {"  pumpkin",   pumpkin, 50, 125, 12*FPS, 0,     1,  0,  true, p_other},
-
+    {"   shovel",    shovel,  1,   0,      0,  0,      0,  0, false,  p_other},
+    {"sunflower", sunflower,  8,  50,  3*FPS,  0,  3*FPS,  0,  true,  p_other},
+    {"  wallnut",   wallnut, 50,  75, 10*FPS,  0,      1,  0,  true,  p_melle},
+    {"spikeweed", spikeweed,  1, 100,  5*FPS,  1,  1*FPS,  0, false,  p_melle},
+    {"  pumpkin",   pumpkin, 50, 125, 12*FPS,  0,      1,  0,  true,  p_other},
+    {"   farmer",    farmer, 10, 450, 30*FPS,  0, 12*FPS,  1,  true, p_remote},
+    {"    dryad",     dryad, 10, 150, 12*FPS,  2,  2*FPS,  1,  true, p_remote},
+    {"   cherry",    cherry, 99, 150, 12*FPS, 50,  1*FPS,  1,  true,  p_other},
 };
 
 const int plant_num = sizeof(plant_table)/sizeof(plant_table[0]);
@@ -32,9 +34,11 @@ protected:
     bool attacked; //whether can be attacked
     int p_type;
 public:
-    Plant(){};
+    Plant(){}
+    virtual void suicide(){}
     bool find_zombie;
     void cooldown();
+    void counter_plus(){counter++;}
     int attack()const{return damage;}
     int show_type()const{return type;}
     int show_HP()const{return HP;}
@@ -66,6 +70,22 @@ public:
     Pumpkin();
 };
 
+class Farmer: public Plant{
+public:
+    Farmer();
+};
+
+class Dryad: public Plant{
+public:
+    Dryad();
+};
+
+class Cherry: public Plant{
+public:
+    Cherry();
+    void suicide();
+};
+
 class Menu{
     int type;
     int costs, CDtime;
@@ -74,7 +94,7 @@ public:
     Menu(){};
     void menu_set(int t, int c, int cd, int pt){type = t; costs = c; CDtime = cd; counter = 0;}
     void cooldown();
-    void no_CDtime() {CDtime = 0;}
+    void no_CDtime() {CDtime = 0; counter = 0;}
     friend class Shop;
 };
 

@@ -104,13 +104,15 @@ void Game::input(char ch) {
             break;
         }
         case KEYENTER: {
-            if (map.grids[cursor_x*MAP_COL+cursor_y].can_plant(shop.show_cart())){
+            int tmp = 0;
+            if (map.spec_type==fort && map.spec_coord==cursor_x*MAP_COL+cursor_y) {tmp = 1;}
+            if (map.grids[cursor_x*MAP_COL+cursor_y].can_plant(shop.show_cart(), tmp)){
                 if (shop.show_cart()!=shovel){
                     map.grids[cursor_x*MAP_COL+cursor_y].add_plant(shop.show_cart());
                     sun -= shop.buy();
                 }
                 else {
-                    int r = map.grids[cursor_x*MAP_COL+cursor_y].use_shovel();
+                    int r = (tmp)?(map.grids[cursor_x*MAP_COL+cursor_y].use_shovel(1)):(map.grids[cursor_x*MAP_COL+cursor_y].use_shovel());
                     sun += (shop.ret_sun(r)+shop.buy());
                 }
             }
@@ -201,6 +203,7 @@ void Game::show_help() {
     printc(YELLOW_BLACK, "  2. "); printc(GREEN_BLACK, "Wallnut\n");
     printc(YELLOW_BLACK, "  3. "); printc(GREEN_BLACK, "Spikeweed\n");
     printc(YELLOW_BLACK, "  4. "); printc(GREEN_BLACK, "Pumpkin\n");
+    printc(YELLOW_BLACK, "  5. "); printc(GREEN_BLACK, "Farmer\n");
     printc(WHITE_BLACK, "Besides, you can press ");
     printc(YELLOW_BLACK, "0 ");
     printc(WHITE_BLACK, "to use the ");
@@ -235,17 +238,20 @@ void Game::show_result() {
 
 int Game::read_map(int choice) {
     FILE *fp;
-    if (choice==0) fp = fopen("src/map/map.txt", "r");
-    else fp = fopen("src/map/map_1.txt", "r");
+    if (choice==1) fp = fopen("src/map/map_1.txt", "r");
+    else if (choice==2) fp = fopen("src/map/map_2.txt", "r");
+    else if (choice==3) fp = fopen("src/map/map_3.txt", "r");
+    else fp = fopen("src/map/map.txt", "r");
     if (!fp) return -1;
     
     fscanf(fp, "%d", &MAP_LINE);
     fscanf(fp, "%d", &MAP_COL);
     fscanf(fp, "%d", &g_path_num);
     fscanf(fp, "%d", &a_path_num);
-    map.set_Map();
-
+    
     if (!(MAP_LINE>0 && MAP_COL>0 && g_path_num>0 && a_path_num>=0)) return -2;
+    map.set_Map();
+    
     for (int i = 0; i < g_path_num + a_path_num; i++) {
         int tmpx, tmpy, tmpd;
         char name[6];
@@ -350,11 +356,17 @@ void Game::start() {
     while(ch != KEYENTER){
         ch = getch();
         if (ch==KEYESC) {endwin();return;}
-        if (ch=='1') map_choice = 1;
-        if (ch=='0') map_choice = 0;
+        if (ch<='3' && ch>='0') map_choice = ch-'0';
     }
     int flag = read_map(map_choice);
-    if(flag<0) {endwin();printf("%d bad idea %d\n", map_choice, flag);return;}//TODO: MORE
+    switch (flag) {
+        case -1: {endwin(); printf("Fail to open the file\n"); return;}
+        case -2: {endwin(); printf("Invalid map_size or path_num\n"); return;}
+        case -3: {endwin(); printf("Invalid path\n"); return;}
+        case -4: {endwin(); printf("Invalid grid_type\n"); return;}
+        case -5: {endwin(); printf("Invalid special_grid\n"); return;}
+        default: break;
+    }
 
     refresh_map();
     begin = clock(), now = clock();

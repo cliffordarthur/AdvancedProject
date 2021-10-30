@@ -15,10 +15,10 @@ void Grid::set_coordinate(int x0, int y0) {
     y = y0;
 }
 
-bool Grid::can_plant(int c) {
+bool Grid::can_plant(int c, int tmp) {
     if (c < 0) return false;
     else if (c == shovel) { 
-        if (p_num == 0) return false;
+        if ((p_num == 0)||(tmp == 1 && p_num == 1)) return false;
     }
     else if (c == pumpkin) {
         if (has_pumpkin) return false;
@@ -48,6 +48,21 @@ void Grid::add_plant(int c) {
     else if (c == spikeweed) {
         p_num++;
         Spikeweed *p = new Spikeweed;
+        this->plant_0 = p;
+    }
+    else if (c == farmer) {
+        p_num++;
+        Farmer *p = new Farmer;
+        this->plant_0 = p;
+    }
+    else if (c == dryad) {
+        p_num++;
+        Dryad *p = new Dryad;
+        this->plant_0 = p;
+    }
+    else if (c == cherry) {
+        p_num++;
+        Cherry *p = new Cherry;
         this->plant_0 = p;
     }
     else return;//TODO: 

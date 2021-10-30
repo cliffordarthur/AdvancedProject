@@ -18,7 +18,7 @@ public:
     void set_type(int t){if (type!=g_z_base) type = t;}
     int show_type() const {return type;}
     void set_coordinate(int x0, int y0);
-    bool can_plant(int c);
+    bool can_plant(int c, int tmp);
     void add_plant(int c);
     int use_shovel();
     int use_shovel(int c);

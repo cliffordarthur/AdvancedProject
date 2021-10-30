@@ -1,7 +1,7 @@
 #include "../../include/plant.h"
 
 void Plant::cooldown() {
-    if ((find_zombie||type==sunflower)&&(counter>0)) counter--;
+    if ((find_zombie||type==sunflower||type==farmer||type==cherry)&&(counter>0)) counter--;
     else counter = speed;
 }
 
@@ -56,4 +56,47 @@ Pumpkin::Pumpkin() {
     this->attacked = plant_table[this->type].attacked;
     this->p_type = plant_table[this->type].p_type;
     this->find_zombie = false;
+}
+
+Farmer::Farmer() {
+    this->type = farmer;
+    this->HP = plant_table[this->type].HP;
+    this->damage = plant_table[this->type].damage;
+    this->speed = plant_table[this->type].speed;
+    this->range = plant_table[this->type].range;
+    this->attacked = plant_table[this->type].attacked;
+    this->p_type = plant_table[this->type].p_type;
+    this->find_zombie = false;
+
+    this->counter = this->speed;
+}
+
+Dryad::Dryad() {
+    this->type = dryad;
+    this->HP = plant_table[this->type].HP;
+    this->damage = plant_table[this->type].damage;
+    this->speed = plant_table[this->type].speed;
+    this->range = plant_table[this->type].range;
+    this->attacked = plant_table[this->type].attacked;
+    this->p_type = plant_table[this->type].p_type;
+    this->find_zombie = false;
+
+    this->counter = this->speed;
+}
+
+Cherry::Cherry() {
+    this->type = cherry;
+    this->HP = plant_table[this->type].HP;
+    this->damage = plant_table[this->type].damage;
+    this->speed = plant_table[this->type].speed;
+    this->range = plant_table[this->type].range;
+    this->attacked = plant_table[this->type].attacked;
+    this->p_type = plant_table[this->type].p_type;
+    this->find_zombie = false;
+
+    this->counter = this->speed;
+}
+
+void Cherry::suicide() {
+    HP = 0;
 }

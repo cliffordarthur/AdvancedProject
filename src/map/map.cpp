@@ -124,6 +124,54 @@ void Map::update(int& sun, bool& lose, int& score) {
                                     }
                                 }
                             }
+                            break;
+                        }
+                        case farmer: {
+                            if (grids[i*MAP_COL+j].plant_0->show_counter()==0) {
+                                if (!grids[i*MAP_COL+j].plant_p) {
+                                    grids[i*MAP_COL+j].add_plant(pumpkin);
+                                }
+                                else if (j < MAP_COL-1 && grids[i*MAP_COL+j+1].show_type()!=g_z_base && !grids[i*MAP_COL+j+1].plant_p) {
+                                    grids[i*MAP_COL+j+1].add_plant(pumpkin);
+                                }
+                                else if (i < MAP_LINE-1 && grids[(i+1)*MAP_COL+j].show_type()!=g_z_base && !grids[(i+1)*MAP_COL+j].plant_p) {
+                                    grids[(i+1)*MAP_COL+j].add_plant(pumpkin);
+                                }
+                                else if (j > 0 && grids[i*MAP_COL+j-1].show_type()!=g_z_base && !grids[i*MAP_COL+j-1].plant_p) {
+                                    grids[i*MAP_COL+j-1].add_plant(pumpkin);
+                                }
+                                else if (i > 0 && grids[(i-1)*MAP_COL+j].show_type()!=g_z_base && !grids[(i-1)*MAP_COL+j].plant_p) {
+                                    grids[(i-1)*MAP_COL+j].add_plant(pumpkin);
+                                }
+                                else grids[i*MAP_COL+j].plant_0->counter_plus();
+                            }
+                            break;
+                        }
+                        case dryad: {
+                            if (grids[i*MAP_COL+j].plant_0->find_zombie && grids[i*MAP_COL+j].plant_0->show_counter()==0) {
+
+                            }
+                            // FIXME: HOW TO ATTACK?(& poison)
+                            break;
+                        }
+                        case cherry: {
+                            if (grids[i*MAP_COL+j].plant_0->show_counter()==0) {
+                                int range = grids[i*MAP_COL+j].plant_0->show_range();
+                                for (int _i = -range; _i <= range; _i++) {
+                                    if (i+_i < 0 || i+_i >= MAP_LINE) continue;
+                                    for (int _j = -range; _j <= range; _j++) {
+                                        if (j+_j < 0 || j+_j >= MAP_COL) continue;
+                                        for (int k = 0, zz = 0; k < ZOMBIE_NUM && zz < grids[(i+_i)*MAP_COL+j+_j].z_num; k++) {
+                                            if (grids[(i+_i)*MAP_COL+j+_j].zombies[k]) {
+                                                zz++;
+                                                grids[(i+_i)*MAP_COL+j+_j].zombies[k]->be_attacked(grids[i*MAP_COL+j].plant_0->attack());
+                                            }
+                                        }
+                                    }
+                                }
+                                grids[i*MAP_COL+j].plant_0->suicide();
+                            }
+                            break;
                         }
                         default: break;
                     }
@@ -230,7 +278,11 @@ void Map::draw(int cursor_x, int cursor_y) {
                     if (i==0 && grids[mapline*MAP_COL+tmp_y].plant_0) {
                         int tmp_type = grids[mapline*MAP_COL+tmp_y].plant_0->show_type();
                         int HP = grids[mapline*MAP_COL+tmp_y].plant_0->show_HP();
-                        printc(GREEN_BLACK, " %s %d", plant_table[tmp_type].name, HP);
+                        switch (plant_table[tmp_type].p_type){
+                            case p_melle: printc(GREEN_BLACK, " %s %d", plant_table[tmp_type].name, HP);break;
+                            case p_remote: printc(CYAN_BLACK, " %s %d", plant_table[tmp_type].name, HP);break;
+                            default: printc(YELLOW_BLACK, " %s %d", plant_table[tmp_type].name, HP);break;
+                        }
                         j+=(strlen(plant_table[tmp_type].name)+get_digits(HP)+1);
                     }
                     else if (i==1 && grids[mapline*MAP_COL+tmp_y].plant_p) {

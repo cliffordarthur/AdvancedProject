@@ -57,7 +57,7 @@ enum COLORS{WHITE_BLACK, RED_BLACK, GREEN_BLACK, YELLOW_BLACK, BLUE_BLACK, MAGEN
 
 #define WIN_SEC 600
 
-enum Plantname{shovel, sunflower, wallnut, spikeweed, pumpkin};//TODO: peashooter, cherrybomb, snowpea
+enum Plantname{shovel, sunflower, wallnut, spikeweed, pumpkin, farmer, dryad, cherry};//TODO: 
 
 enum Zombiename{zombie, conehead};//TODO: polevault, newspaper, ...
 
