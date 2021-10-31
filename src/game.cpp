@@ -103,6 +103,10 @@ void Game::input(char ch) {
             shop.add_to_cart(ch-'0', sun);
             break;
         }
+        case '-': {
+            shop.add_to_cart(shovel, sun);
+            break;
+        }
         case KEYENTER: {
             int tmp = 0;
             if (map.spec_type==fort && map.spec_coord==cursor_x*MAP_COL+cursor_y) {tmp = 1;}
@@ -139,6 +143,10 @@ void Game::input(char ch) {
             map.cheat_kill();
             break;
         }
+        case 'z': {
+            cheat_gen_zombie(10);
+            break;
+        }
         default: break;
     }
 }
@@ -152,7 +160,7 @@ void Game::gen_sun() {
 void Game::gen_zombie() {
     if (rand()%(FPS*5)==0) {
         int type = zombie;
-        bool flag;
+        // bool flag;
         if (rand()%5 == 0) type = conehead;  
 
         switch (type) {
@@ -170,6 +178,32 @@ void Game::gen_zombie() {
             }
             default: break;
         }   
+    }
+}
+
+void Game::cheat_gen_zombie(int num) {
+    for (int i = 0; i < num; i++) {
+        int type = zombie;
+        if (rand()%5 == 0) type = conehead;
+        switch(type) {
+            case zombie: {
+                Zombie *z = new Zombie;
+                z->set_direction(map.g_path[z->show_path()]->direction);
+                z->be_attacked(-9*z->show_HP());
+                z->set_total_HP(z->show_HP());
+                map.grids[map.g_path[z->show_path()]->x*MAP_COL+map.g_path[z->show_path()]->y].add_zombie(z);
+                break;
+            }
+            case conehead: {
+                Conehead *z = new Conehead;
+                z->set_direction(map.g_path[z->show_path()]->direction);
+                z->be_attacked(-9*z->show_HP());
+                z->set_total_HP(z->show_HP());
+                map.grids[map.g_path[z->show_path()]->x*MAP_COL+map.g_path[z->show_path()]->y].add_zombie(z);
+                break;
+            }
+            default: break;
+        }
     }
 }
 

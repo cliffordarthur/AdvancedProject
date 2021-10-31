@@ -27,10 +27,16 @@ int Zombies::cross_grid(int i, int j) {
     return next;
 }
 
+void Zombies::suffer_poison() {
+    if (poison>0 && poison%FPS==0) {HP-=max(1, total_HP/40);}
+    poison--;
+}
+
 Zombie::Zombie() {
     this->type = zombie;
-    this->HP = zombie_table[this->type].HP;
-    this->damage = 1;
+    this->total_HP = zombie_table[this->type].HP;
+    this->HP = this->total_HP;
+    this->damage = zombie_table[this->type].damage;
     this->speed = zombie_table[this->type].speed;
     this->counter = this->speed;
     this->stride = zombie_table[this->type].stride;
@@ -39,12 +45,14 @@ Zombie::Zombie() {
     this->path = rand()%g_path_num;
     this->direction = 0;
     this->crazy = false;
+    this->poison = 0;
 }
 
 Conehead::Conehead() {
     this->type = conehead;
-    this->HP = zombie_table[this->type].HP;
-    this->damage = 1;
+    this->total_HP = zombie_table[this->type].HP;
+    this->HP = this->total_HP;
+    this->damage = zombie_table[this->type].damage;
     this->speed = zombie_table[this->type].speed;
     this->counter = this->speed;
     this->stride = zombie_table[this->type].stride;
@@ -53,4 +61,5 @@ Conehead::Conehead() {
     this->path = rand()%g_path_num;
     this->direction = 0;
     this->crazy = false;
+    this->poison = 0;
 }

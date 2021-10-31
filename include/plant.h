@@ -13,14 +13,18 @@ struct Planttable{
     bool attacked;//FIXME: in zombies
     int p_type;
 }static plant_table[] = {
-    {"   shovel",    shovel,  1,   0,      0,  0,      0,  0, false,  p_other},
-    {"sunflower", sunflower,  8,  50,  3*FPS,  0,  3*FPS,  0,  true,  p_other},
-    {"  wallnut",   wallnut, 50,  75, 10*FPS,  0,      1,  0,  true,  p_melle},
-    {"spikeweed", spikeweed,  1, 100,  5*FPS,  1,  1*FPS,  0, false,  p_melle},
-    {"  pumpkin",   pumpkin, 50, 125, 12*FPS,  0,      1,  0,  true,  p_other},
-    {"   farmer",    farmer, 10, 450, 30*FPS,  0, 12*FPS,  1,  true, p_remote},
-    {"    dryad",     dryad, 10, 150, 12*FPS,  2,  2*FPS,  1,  true, p_remote},
-    {"   cherry",    cherry, 99, 150, 12*FPS, 50,  1*FPS,  1,  true,  p_other},
+    {"    dryad",     dryad, 100, 150, 12*FPS,   5,  2*FPS,  1,  true, p_remote},
+    {"sunflower", sunflower,  80,  50,  3*FPS,   0,  3*FPS,  0,  true,  p_other},
+    {"   cherry",    cherry, 999, 150, 12*FPS, 500,  1*FPS,  1,  true,  p_other},
+    {"  pumpkin",   pumpkin, 500, 125, 12*FPS,   0,      1,  0,  true,  p_other},
+    {"  wallnut",   wallnut, 500,  75, 10*FPS,   0,      1,  0,  true,  p_melle},
+    {"spikeweed", spikeweed,  30, 100,  5*FPS,  10,  1*FPS,  0, false,  p_melle},
+    {"   bamboo",    bamboo, 150, 100,  8*FPS,  20,  1*FPS,  2,  true,  p_melle},//
+    {"  cabbage",   cabbage, 150, 100,  8*FPS,  20,  2*FPS,  3,  true,  p_melle},//
+    {"   farmer",    farmer, 100, 450, 30*FPS,   0, 12*FPS,  1,  true, p_remote},
+    {"      pea",       pea, 100, 100,  6*FPS,  10,  1*FPS,  2,  true, p_remote},//
+
+    {"   shovel",    shovel,   1,   0,      0,   0,      0,  0, false,  p_other},
 };
 
 const int plant_num = sizeof(plant_table)/sizeof(plant_table[0]);
@@ -36,7 +40,8 @@ protected:
 public:
     Plant(){}
     virtual void suicide(){}
-    bool find_zombie;
+    virtual int poison(){return 0;}
+    int find_zombie;
     void cooldown();
     void counter_plus(){counter++;}
     int attack()const{return damage;}
@@ -78,12 +83,28 @@ public:
 class Dryad: public Plant{
 public:
     Dryad();
+    int poison();
 };
 
 class Cherry: public Plant{
 public:
     Cherry();
     void suicide();
+};
+
+class Cabbage: public Plant{
+public:
+    Cabbage();
+};
+
+class Bamboo: public Plant{
+public:
+    Bamboo();
+};
+
+class Pea: public Plant{
+public:
+    Pea();
 };
 
 class Menu{

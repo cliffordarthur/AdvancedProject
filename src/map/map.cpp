@@ -68,22 +68,40 @@ void Map::set_type(int t, int x1, int y1, int x2, int y2){
     else assert(0);
 }
 
-bool Map::find_enemy(bool is_plant, int r, int x, int y){//FIXME: 
+int Map::find_enemy(bool is_plant, int r, int x, int y){//FIXME: //TODO:  r can change!
     if (is_plant) {
-        for (int i = 0; i < MAP_LINE; i++) {
-            for (int j = 0; j < MAP_COL; j++) {
-                if ((abs(x-i)+abs(y-j)<=r) && (grids[i*MAP_COL+j].z_num)) return true;
+        for (int rr = 0; rr <= r; rr++){
+            for (int i = -rr; i <= rr; i++) {
+                if (x + i < 0 || x + i >= MAP_LINE) continue;
+                for (int j = -rr; j <= rr; j++) {
+                    if (y + j < 0 || y + j >= MAP_COL || (-rr+1<=i && i<=rr-1 && -rr+1<=j && j<=rr-1)) continue;
+                    if (grids[(x+i)*MAP_COL+y+j].z_num) return (x+i)*MAP_COL+y+j;   
+                }
             }
         }
     }
     else {
         if (grids[x*MAP_COL+y].p_num) {
-            if (!grids[x*MAP_COL+y].has_pumpkin && !grids[x*MAP_COL+y].plant_0->show_attacked()) return false;
-            return true;
+            if (!grids[x*MAP_COL+y].has_pumpkin && !grids[x*MAP_COL+y].plant_0->show_attacked()) return -1;
+            return x*MAP_COL+y;
         }
-        
     }
-    return false;
+    return -1;
+    // if (is_plant) {
+    //     for (int i = 0; i < MAP_LINE; i++) {
+    //         for (int j = 0; j < MAP_COL; j++) {
+    //             if ((abs(x-i)+abs(y-j)<=r) && (grids[i*MAP_COL+j].z_num)) return true;
+    //         }
+    //     }
+    // }
+    // else {
+    //     if (grids[x*MAP_COL+y].p_num) {
+    //         if (!grids[x*MAP_COL+y].has_pumpkin && !grids[x*MAP_COL+y].plant_0->show_attacked()) return false;
+    //         return true;
+    //     }
+        
+    // }
+    // return false;
 }
 
 void Map::update(int& sun, bool& lose, int& score) {
@@ -117,7 +135,7 @@ void Map::update(int& sun, bool& lose, int& score) {
                             break;
                         }
                         case spikeweed: {
-                            if (grids[i*MAP_COL+j].plant_0->find_zombie && grids[i*MAP_COL+j].plant_0->show_counter()==0) {
+                            if (grids[i*MAP_COL+j].plant_0->find_zombie >= 0 && grids[i*MAP_COL+j].plant_0->show_counter()==0) {
                                 for (int k = 0; k < ZOMBIE_NUM; k++) {
                                     if (grids[i*MAP_COL+j].zombies[k]) {
                                         grids[i*MAP_COL+j].zombies[k]->be_attacked(grids[i*MAP_COL+j].plant_0->attack());
@@ -148,10 +166,30 @@ void Map::update(int& sun, bool& lose, int& score) {
                             break;
                         }
                         case dryad: {
-                            if (grids[i*MAP_COL+j].plant_0->find_zombie && grids[i*MAP_COL+j].plant_0->show_counter()==0) {
-
+                            if (grids[i*MAP_COL+j].plant_0->find_zombie >= 0 && grids[i*MAP_COL+j].plant_0->show_counter()==0) {
+                                int target = grids[i*MAP_COL+j].plant_0->find_zombie;
+                                for (int k = 0; k < ZOMBIE_NUM; k++) {
+                                    if (grids[target].zombies[k]) {
+                                        grids[target].zombies[k]->be_attacked(grids[i*MAP_COL+j].plant_0->attack());
+                                        grids[target].zombies[k]->be_poisoned(grids[i*MAP_COL+j].plant_0->poison());
+                                        break;
+                                    }
+                                }
                             }
-                            // FIXME: HOW TO ATTACK?(& poison)
+                            break;
+                        }
+                        case bamboo:
+                        case cabbage:
+                        case pea: {
+                            if (grids[i*MAP_COL+j].plant_0->find_zombie >= 0 && grids[i*MAP_COL+j].plant_0->show_counter()==0) {
+                                int target = grids[i*MAP_COL+j].plant_0->find_zombie;
+                                for (int k = 0; k < ZOMBIE_NUM; k++) {
+                                    if (grids[target].zombies[k]) {
+                                        grids[target].zombies[k]->be_attacked(grids[i*MAP_COL+j].plant_0->attack());
+                                        break;
+                                    }
+                                }
+                            }
                             break;
                         }
                         case cherry: {
@@ -183,6 +221,7 @@ void Map::update(int& sun, bool& lose, int& score) {
                 for (int k = 0, zz = 0; k < ZOMBIE_NUM && zz < tmp_z_num; k++) {
                     if (!grids[i*MAP_COL+j].zombies[k]) continue;
                     zz++;
+                    if (grids[i*MAP_COL+j].zombies[k]->show_poison()) {grids[i*MAP_COL+j].zombies[k]->suffer_poison();}
                     if (grids[i*MAP_COL+j].zombies[k]->show_HP() <= 0) {
                         score += zombie_table[grids[i*MAP_COL+j].zombies[k]->show_type()].score;
                         grids[i*MAP_COL+j].free_zombie(k);
@@ -195,7 +234,7 @@ void Map::update(int& sun, bool& lose, int& score) {
                             case zombie:
                             case conehead:{
                                 if (grids[i*MAP_COL+j].zombies[k]->show_counter()==0) {
-                                    if (!grids[i*MAP_COL+j].zombies[k]->find_plant) {
+                                    if (grids[i*MAP_COL+j].zombies[k]->find_plant == -1) {
                                         int ready = grids[i*MAP_COL+j].zombies[k]->walk();
                                         if (ready) {
                                             int next = grids[i*MAP_COL+j].zombies[k]->cross_grid(i, j);
@@ -297,7 +336,9 @@ void Map::draw(int cursor_x, int cursor_y) {
                                 if (!ii) {
                                     int tmp_type = grids[mapline*MAP_COL+tmp_y].zombies[k]->show_type();
                                     int HP = grids[mapline*MAP_COL+tmp_y].zombies[k]->show_HP();
-                                    printc(BLUE_BLACK, " %s %d", zombie_table[tmp_type].name, HP);
+                                    printc(BLUE_BLACK, " %s ", zombie_table[tmp_type].name);
+                                    if (grids[mapline*MAP_COL+ tmp_y].zombies[k]->show_poison()) {printc(GREEN_BLACK, "%d", HP);}
+                                    else printc(BLUE_BLACK, "%d", HP);
                                     j+=(strlen(zombie_table[tmp_type].name)+get_digits(HP)+1);
                                     break;
                                 }

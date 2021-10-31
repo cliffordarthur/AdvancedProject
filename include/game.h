@@ -20,6 +20,7 @@ public:
     void start();
     void gen_sun();
     void gen_zombie();
+    void cheat_gen_zombie(int num);
     void show_result();
     void refresh_map();
     void wait();

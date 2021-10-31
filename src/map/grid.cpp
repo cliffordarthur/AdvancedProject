@@ -65,6 +65,21 @@ void Grid::add_plant(int c) {
         Cherry *p = new Cherry;
         this->plant_0 = p;
     }
+    else if (c == bamboo) {
+        p_num++;
+        Bamboo *p = new Bamboo;
+        this->plant_0 = p;
+    }
+    else if (c == cabbage) {
+        p_num++;
+        Cabbage *p = new Cabbage;
+        this->plant_0 = p;
+    }
+    else if (c == pea) {
+        p_num++;
+        Pea *p = new Pea;
+        this->plant_0 = p;
+    }
     else return;//TODO: 
 }
 

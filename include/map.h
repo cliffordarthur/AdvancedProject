@@ -55,7 +55,7 @@ public:
     void set_type(int t, int x1, int y1, int x2, int y2);
     void update(int& sun, bool& lose, int& score);
     void draw(int cursor_x, int cursor_y);
-    bool find_enemy(bool is_plant, int r, int x, int y);
+    int find_enemy(bool is_plant, int r, int x, int y);
     void cheat_kill() {for (int i = 0; i < grids.size(); i++) grids[i].cheat_kill();}
     friend class Game;
 };

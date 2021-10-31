@@ -51,13 +51,17 @@ inline void printnc(int n, int color, const char* s) {
     }
 }
 
+inline int max(int a, int b) {
+    return (a>b)?a:b;
+}
+
 enum COLORS{WHITE_BLACK, RED_BLACK, GREEN_BLACK, YELLOW_BLACK, BLUE_BLACK, MAGENTA_BLACK, CYAN_BLACK};
 
 #define ZOMBIE_NUM 256
 
 #define WIN_SEC 600
 
-enum Plantname{shovel, sunflower, wallnut, spikeweed, pumpkin, farmer, dryad, cherry};//TODO: 
+enum Plantname{dryad, sunflower, cherry, pumpkin, wallnut, spikeweed, bamboo, cabbage, farmer, pea, shovel};
 
 enum Zombiename{zombie, conehead};//TODO: polevault, newspaper, ...
 
