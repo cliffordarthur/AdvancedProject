@@ -160,20 +160,21 @@ void Game::gen_sun() {
 void Game::gen_zombie() {
     if (rand()%(FPS*5)==0) {
         int type = zombie;
-        // bool flag;
         if (rand()%5 == 0) type = conehead;  
-
+        int target;
         switch (type) {
             case zombie: {
                 Zombie *z = new Zombie;
-                z->set_direction(map.g_path[z->show_path()]->direction);
-                map.grids[map.g_path[z->show_path()]->x*MAP_COL+map.g_path[z->show_path()]->y].add_zombie(z);
+                target = map.start[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target]);
+                map.grids[target].add_zombie(z);
                 break;
             }
             case conehead: {
                 Conehead *z = new Conehead;
-                z->set_direction(map.g_path[z->show_path()]->direction);
-                map.grids[map.g_path[z->show_path()]->x*MAP_COL+map.g_path[z->show_path()]->y].add_zombie(z);
+                target = map.start[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target]);
+                map.grids[target].add_zombie(z);
                 break;
             }
             default: break;
@@ -184,22 +185,25 @@ void Game::gen_zombie() {
 void Game::cheat_gen_zombie(int num) {
     for (int i = 0; i < num; i++) {
         int type = zombie;
+        int target;
         if (rand()%5 == 0) type = conehead;
         switch(type) {
             case zombie: {
                 Zombie *z = new Zombie;
-                z->set_direction(map.g_path[z->show_path()]->direction);
+                target = map.start[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target]);
                 z->be_attacked(-9*z->show_HP());
                 z->set_total_HP(z->show_HP());
-                map.grids[map.g_path[z->show_path()]->x*MAP_COL+map.g_path[z->show_path()]->y].add_zombie(z);
+                map.grids[target].add_zombie(z);
                 break;
             }
             case conehead: {
                 Conehead *z = new Conehead;
-                z->set_direction(map.g_path[z->show_path()]->direction);
+                target = map.start[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target]);
                 z->be_attacked(-9*z->show_HP());
                 z->set_total_HP(z->show_HP());
-                map.grids[map.g_path[z->show_path()]->x*MAP_COL+map.g_path[z->show_path()]->y].add_zombie(z);
+                map.grids[target].add_zombie(z);
                 break;
             }
             default: break;
@@ -233,12 +237,16 @@ void Game::show_help() {
     printc(WHITE_BLACK, "to cancel the purchase.\n\n");
 
     printc(WHITE_BLACK, "This is the correspondence between plants and number keys:\n");
-    printc(YELLOW_BLACK, "  1. "); printc(GREEN_BLACK, "Sunflower\n");
-    printc(YELLOW_BLACK, "  2. "); printc(GREEN_BLACK, "Wallnut\n");
-    printc(YELLOW_BLACK, "  3. "); printc(GREEN_BLACK, "Spikeweed\n");
-    printc(YELLOW_BLACK, "  4. "); printc(GREEN_BLACK, "Pumpkin\n");
-    printc(YELLOW_BLACK, "  5. "); printc(GREEN_BLACK, "Farmer\n");
-    printc(WHITE_BLACK, "Besides, you can press ");
+    for (int i = 1; i < plant_num-1; i++) {
+        printc(YELLOW_BLACK, "  %d.  ", i);
+        printc(GREEN_BLACK, plant_table[i].name);
+        if (i%2) printw("\t\t\t");
+        else printw("\n");
+
+        if (i == plant_num-2) i = -1;
+        else if (!i) break;
+    }
+    printc(WHITE_BLACK, "\nBesides, you can press ");
     printc(YELLOW_BLACK, "0 ");
     printc(WHITE_BLACK, "to use the ");
     printc(GREEN_BLACK, "shovel\n\n");
@@ -288,48 +296,72 @@ int Game::read_map(int choice) {
     
     for (int i = 0; i < g_path_num + a_path_num; i++) {
         int tmpx, tmpy, tmpd;
+        int lastx = -1, lasty = -1, lastd = -1;
         char name[6];
         bool flag = true;
-        Path *p = nullptr;
 
-        while (flag) {         
-            fscanf(fp, "%d", &tmpx);
-            fscanf(fp, "%d", &tmpy);
-            fscanf(fp, "%5s", name);
-                    
-            if (!(tmpx>=0 && tmpx<MAP_LINE && tmpy>=0 && tmpy<MAP_COL)) return -3;
-            if (p) {
-                switch (p->direction) {
-                    case    diup: if (!(p->x > tmpx && p->y == tmpy)) return -3; break;
-                    case  didown: if (!(p->x < tmpx && p->y == tmpy)) return -3; break;
-                    case  dileft: if (!(p->y > tmpy && p->x == tmpx)) return -3; break;
-                    case diright: if (!(p->y < tmpy && p->x == tmpx)) return -3; break;
-                    default: return -3;
-                }
+        while (1) {
+            if (flag) {
+                fscanf(fp, "%d", &tmpx);
+                fscanf(fp, "%d", &tmpy);
+                fscanf(fp, "%5s", name);
+                        
+                if (!(tmpx>=0 && tmpx<MAP_LINE && tmpy>=0 && tmpy<MAP_COL)) return -3;
+
+                if (strcmp(name, "up")==0) tmpd=diup;
+                else if (strcmp(name, "down")==0) tmpd=didown;
+                else if (strcmp(name, "left")==0) tmpd=dileft;
+                else if (strcmp(name, "right")==0) tmpd=diright;
+                else if (strcmp(name, "end")==0) {tmpd=diend; flag=false;}
+                else return -3;
             }
-            
-            if (strcmp(name, "up")==0) tmpd=diup;
-            else if (strcmp(name, "down")==0) tmpd=didown;
-            else if (strcmp(name, "left")==0) tmpd=dileft;
-            else if (strcmp(name, "right")==0) tmpd=diright;
-            else if (strcmp(name, "end")==0) {tmpd=diend; flag=false;}
-            else return -3;
 
-            Path *q = new Path(tmpx, tmpy, tmpd, nullptr);
-            if (!p) {
-                if (i<g_path_num) {
-                    map.grids[tmpx*MAP_COL+tmpy].set_type(g_z_base);
-                    map.g_path[i] = q;
-                    p = map.g_path[i];
+            if (i < g_path_num+a_path_num) {
+                if (map.start[i] == -1) {
+                    map.start[i] = tmpx*MAP_COL+tmpy;
+                    if (i < g_path_num) map.grids[tmpx*MAP_COL+tmpy].set_type(g_z_base);
                 }
                 else {
-                    map.a_path[i-g_path_num] = q;
-                    p = map.a_path[i-g_path_num];
+                    switch (lastd) {
+                        case diup: {
+                            if (!(lastx > tmpx && lasty == tmpy)) return -3;
+                            for (int l = lastx; l > tmpx ; l--) {
+                                map.paths[i][l*MAP_COL+tmpy] = lastd;
+                            }
+                            break;
+                        }
+                        case didown: {
+                            if (!(lastx < tmpx && lasty == tmpy)) return -3;
+                            for (int l = lastx; l < tmpx ; l++) {
+                                map.paths[i][l*MAP_COL+tmpy] = lastd;
+                            }
+                            break;
+                        }
+                        case dileft: {
+                            if (!(lasty > tmpy && lastx == tmpx)) return -3;
+                            for (int l = lasty; l > tmpy ; l--) {
+                                map.paths[i][tmpx*MAP_COL+l] = lastd;
+                            }
+                            break;
+                        }
+                        case diright: {
+                            if (!(lasty < tmpy && lastx == tmpx)) return -3; 
+                            for (int l = lasty; l < tmpy ; l++) {
+                                map.paths[i][tmpx*MAP_COL+l] = lastd;
+                            }
+                            break;
+                        }
+                        case diend: {
+                            map.paths[i][lastx*MAP_COL+lasty] = lastd;
+                            break;
+                        }
+                        default: return -3;
+                    }
+                    if (lastd == diend) break;
                 }
-            }
-            else {
-                p->next = q;
-                p = q;
+                lastx = tmpx;
+                lasty = tmpy;
+                lastd = tmpd;
             }
         }
     }
@@ -348,10 +380,8 @@ int Game::read_map(int choice) {
     }
     else {
         for (int i = 0; i < g_path_num; i++) {
-            Path *p = map.g_path[i];
-            while (p && p->next) {
-                map.set_type(melle, p->x, p->y, p->next->x, p->next->y);
-                p = p->next;
+            for (int j = 0; j < MAP_LINE*MAP_COL; j++) {
+                if (map.paths[i][j]>=0) {map.grids[j].set_type(melle);}
             }
         }
     }

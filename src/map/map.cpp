@@ -15,27 +15,11 @@ int get_digits(int num) {
 Map::~Map() {
     // for (int i = 0; i < MAP_LINE; i++) {
     //     for (int j = 0; j  <MAP_COL; j++) {
-    //         std::cout<<grids[i*MAP_COL+j].show_type()<<" ";
+    //         // std::cout<<grids[i*MAP_COL+j].show_type()<<" ";
+    //         std::cout<<paths[1][i*MAP_COL+j]<<" ";
     //     }
     //     std::cout<<"\n";
     // }
-    
-    for (int i = 0; i < g_path_num; i++) {
-        if (!g_path.size()) break;
-        while (g_path[i]) {
-            Path *p = g_path[i];
-            g_path[i] = g_path[i]->next;
-            delete p;
-        }
-    }
-    for (int i = 0; i < a_path_num; i++) {
-        if (!a_path.size()) break;
-        while (a_path[i]) {
-            Path *p = a_path[i];
-            a_path[i] = a_path[i]->next;
-            delete p;
-        }
-    }
 }
 
 void Map::set_Map(){
@@ -43,29 +27,17 @@ void Map::set_Map(){
     spec_type = -1;
     spec_coord = -1;
     grids.resize(MAP_LINE*MAP_COL);
-    g_path.resize(g_path_num, nullptr);
-    a_path.resize(a_path_num, nullptr);
+    paths.resize(g_path_num+a_path_num);
+    for (int i = 0; i < g_path_num+a_path_num; i++) {
+        paths[i].resize(MAP_LINE*MAP_COL, -1);
+    }
+    start.resize(g_path_num+a_path_num, -1);
 
     for (int i = 0; i < MAP_LINE; i++) {
         for (int j = 0; j < MAP_COL; j++) {
             grids[i*MAP_COL+j].set_coordinate(i, j);
         }
     }
-}
-
-void Map::set_type(int t, int x1, int y1, int x2, int y2){
-    int s, l;
-    if (x1==x2) {
-        s = (y1<y2)?y1:y2;
-        l = (y1>y2)?y1:y2;
-        for (int i = s; i <= l; i++) grids[x1*MAP_COL+i].set_type(t);
-    }
-    else if (y1==y2) {
-        s = (x1<x2)?x1:x2;
-        l = (x1>x2)?x1:x2;
-        for (int i = s; i <= l; i++) grids[i*MAP_COL+y1].set_type(t);
-    }
-    else assert(0);
 }
 
 int Map::find_enemy(bool is_plant, int r, int x, int y){//FIXME: //TODO:  r can change!
@@ -87,21 +59,6 @@ int Map::find_enemy(bool is_plant, int r, int x, int y){//FIXME: //TODO:  r can 
         }
     }
     return -1;
-    // if (is_plant) {
-    //     for (int i = 0; i < MAP_LINE; i++) {
-    //         for (int j = 0; j < MAP_COL; j++) {
-    //             if ((abs(x-i)+abs(y-j)<=r) && (grids[i*MAP_COL+j].z_num)) return true;
-    //         }
-    //     }
-    // }
-    // else {
-    //     if (grids[x*MAP_COL+y].p_num) {
-    //         if (!grids[x*MAP_COL+y].has_pumpkin && !grids[x*MAP_COL+y].plant_0->show_attacked()) return false;
-    //         return true;
-    //     }
-        
-    // }
-    // return false;
 }
 
 void Map::update(int& sun, bool& lose, int& score) {
@@ -239,17 +196,9 @@ void Map::update(int& sun, bool& lose, int& score) {
                                         if (ready) {
                                             int next = grids[i*MAP_COL+j].zombies[k]->cross_grid(i, j);
                                             if (next<0) {lose = true; return;}
-                                            Path *p = g_path[grids[i*MAP_COL+j].zombies[k]->show_path()];
-                                            while (p) {
-                                                if (p->x*MAP_COL+p->y==next) {
-                                                    grids[i*MAP_COL+j].zombies[k]->set_direction(p->direction);
-                                                    break;
-                                                }
-                                                p = p->next;
-                                            }
+                                            grids[i*MAP_COL+j].zombies[k]->set_direction(paths[grids[i*MAP_COL+j].zombies[k]->show_path()][next]);
                                             grids[next].add_zombie(grids[i*MAP_COL+j].zombies[k]);
-                                            grids[i*MAP_COL+j].del_zombie(k);
-                                            
+                                            grids[i*MAP_COL+j].del_zombie(k);                                  
                                         }
                                     }
                                     else {

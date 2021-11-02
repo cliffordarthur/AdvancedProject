@@ -13,8 +13,6 @@ Shop::Shop(){
 }
 
 void Shop::add_to_cart(int i, int sun) {
-    // if (i!=shovel && i) i--;
-    // else if (!i) i = plant_num-1-1;
     if (sun < menu[i].costs || menu[i].counter!=0) fail_to_cart = i;
     else cart = i;
 }
