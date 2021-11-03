@@ -32,19 +32,11 @@ public:
     friend class Map;
 };
 
-struct Path{
-    int x, y;
-    int direction;
-    Path* next;
-    
-    Path(const int& x = 0, const int& y = 0, const int& direction = 0, Path* next = nullptr):
-        x(x), y(y), direction(direction), next(next) {}
-};
-
 class Map{
     std::vector<Grid> grids;
     std::vector< std::vector<int> > paths;
     std::vector<int> start;
+    std::vector<int> length;
 
     int spec_type;
     int spec_coord;
@@ -55,7 +47,12 @@ public:
     void set_Map();
     void update(int& sun, bool& lose, int& score);
     void draw(int cursor_x, int cursor_y);
-    int find_enemy(bool is_plant, int r, int x, int y);
+    
+    // int find_enemy(bool is_plant, int r, int x, int y);
+    int find_zombies(int r, int x, int y);
+    int find_plants(int r, int x, int y, int p, bool a_d);
+    int find_next_n(int n, int x, int y, int p);
+    
     void cheat_kill() {for (int i = 0; i < grids.size(); i++) grids[i].cheat_kill();}
     friend class Game;
 };

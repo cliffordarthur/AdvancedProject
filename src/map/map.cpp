@@ -10,8 +10,6 @@ int get_digits(int num) {
     return d;
 }
 
-
-
 Map::~Map() {
     // for (int i = 0; i < MAP_LINE; i++) {
     //     for (int j = 0; j  <MAP_COL; j++) {
@@ -32,6 +30,7 @@ void Map::set_Map(){
         paths[i].resize(MAP_LINE*MAP_COL, -1);
     }
     start.resize(g_path_num+a_path_num, -1);
+    length.resize(g_path_num+a_path_num, -1);
 
     for (int i = 0; i < MAP_LINE; i++) {
         for (int j = 0; j < MAP_COL; j++) {
@@ -40,25 +39,90 @@ void Map::set_Map(){
     }
 }
 
-int Map::find_enemy(bool is_plant, int r, int x, int y){//FIXME: //TODO:  r can change!
-    if (is_plant) {
+// int Map::find_enemy(bool is_plant, int r, int x, int y){//FIXME: //TODO:  r can change!
+//     if (is_plant) {
+//         for (int rr = 0; rr <= r; rr++){
+//             for (int i = -rr; i <= rr; i++) {
+//                 if (x + i < 0 || x + i >= MAP_LINE) continue;
+//                 for (int j = -rr; j <= rr; j++) {
+//                     if (y + j < 0 || y + j >= MAP_COL || (-rr+1<=i && i<=rr-1 && -rr+1<=j && j<=rr-1)) continue;
+//                     if (grids[(x+i)*MAP_COL+y+j].z_num) return (x+i)*MAP_COL+y+j;   
+//                 }
+//             }
+//         }
+//     }
+//     else {
+//         if (grids[x*MAP_COL+y].p_num) {
+//             if (!grids[x*MAP_COL+y].has_pumpkin && !grids[x*MAP_COL+y].plant_0->show_attacked()) return -1;
+//             return x*MAP_COL+y;
+//         }
+//     }
+//     return -1;
+// }
+
+/*Return the coordinates of zombie within range r. Return -1 if zombie does not exists*/
+int Map::find_zombies(int r, int x, int y) {
+    for (int rr = 0; rr <= r; rr++){
+        for (int i = -rr; i <= rr; i++) {
+            if (x + i < 0 || x + i >= MAP_LINE) continue;
+            for (int j = -rr; j <= rr; j++) {
+                if (y + j < 0 || y + j >= MAP_COL || (-rr+1<=i && i<=rr-1 && -rr+1<=j && j<=rr-1)) continue;
+                if (grids[(x+i)*MAP_COL+y+j].z_num) return (x+i)*MAP_COL+y+j;   
+            }
+        }
+    }
+    return -1;
+}
+
+/*Return the coordinates of plant within range r. Return -1 if plant does not exists*/
+int Map::find_plants(int r, int x, int y, int p, bool a_d) {
+    int target;
+    if (a_d) {
         for (int rr = 0; rr <= r; rr++){
             for (int i = -rr; i <= rr; i++) {
                 if (x + i < 0 || x + i >= MAP_LINE) continue;
                 for (int j = -rr; j <= rr; j++) {
                     if (y + j < 0 || y + j >= MAP_COL || (-rr+1<=i && i<=rr-1 && -rr+1<=j && j<=rr-1)) continue;
-                    if (grids[(x+i)*MAP_COL+y+j].z_num) return (x+i)*MAP_COL+y+j;   
+                    target = (x+i)*MAP_COL+y+j;
+                    if (grids[target].p_num && (grids[target].has_pumpkin || grids[target].plant_0->show_s_n())) return target;   
                 }
             }
         }
     }
     else {
-        if (grids[x*MAP_COL+y].p_num) {
-            if (!grids[x*MAP_COL+y].has_pumpkin && !grids[x*MAP_COL+y].plant_0->show_attacked()) return -1;
-            return x*MAP_COL+y;
+        while (r>=0) {
+            target = x*MAP_COL+y;
+            if (grids[target].p_num && (grids[target].has_pumpkin || grids[target].plant_0->show_attacked())) return target;   
+            int d = paths[p][target];
+            switch (d) {
+                case    diup: x--; break;
+                case  didown: x++; break;        
+                case  dileft: y--; break;
+                case diright: y++; break;
+                default: return -1;
+            }
+            r--;
         }
     }
     return -1;
+}
+
+int Map::find_next_n(int n, int x, int y, int p) {
+    assert(n>=0);
+    int target;
+    while (n >= 0) {
+        target =  x*MAP_COL+y;
+        int d = paths[p][target];
+        switch (d) {
+            case    diup: x--; break;
+            case  didown: x++; break;
+            case  dileft: y--; break;
+            case diright: y++; break;
+            default: return target;
+        }
+        n--;
+    }
+    return target;
 }
 
 void Map::update(int& sun, bool& lose, int& score) {
@@ -77,7 +141,7 @@ void Map::update(int& sun, bool& lose, int& score) {
                     grids[i*MAP_COL+j].use_shovel(1);
                 }
                 else{
-                    grids[i*MAP_COL+j].plant_0->find_zombie = find_enemy(true, grids[i*MAP_COL+j].plant_0->show_range(), i, j);
+                    grids[i*MAP_COL+j].plant_0->find_zombie = find_zombies(grids[i*MAP_COL+j].plant_0->show_range(), i, j);
                     grids[i*MAP_COL+j].plant_0->cooldown();
                     switch (grids[i*MAP_COL+j].plant_0->show_type()) {
                         case sunflower: {
@@ -183,33 +247,85 @@ void Map::update(int& sun, bool& lose, int& score) {
                         score += zombie_table[grids[i*MAP_COL+j].zombies[k]->show_type()].score;
                         grids[i*MAP_COL+j].free_zombie(k);
                     }
+                    else if (grids[i*MAP_COL+j].zombies[k]->show_type() == gargantuar &&
+                        grids[i*MAP_COL+j].zombies[k]->has_throw==-1 &&
+                        ((grids[i*MAP_COL+j].zombies[k]->show_HP() <= grids[i*MAP_COL+j].zombies[k]->show_t_HP()/2) || 
+                        (grids[i*MAP_COL+j].zombies[k]->show_r_g() <= length[grids[i*MAP_COL+j].zombies[k]->show_path()]/2))) {
+                        grids[i*MAP_COL+j].zombies[k]->has_throw = FPS;
+                    }
+                    else if (grids[i*MAP_COL+j].zombies[k]->has_throw>0) {grids[i*MAP_COL+j].zombies[k]->has_throw--;}
                     else {
                         if (spec_type==d_fort) {grids[i*MAP_COL+j].zombies[k]->get_crazy();}
-                        grids[i*MAP_COL+j].zombies[k]->find_plant = find_enemy(false, 0, i, j);
+                        int target = find_plants(grids[i*MAP_COL+j].zombies[k]->show_range(), i, j, 
+                            grids[i*MAP_COL+j].zombies[k]->show_path(), grids[i*MAP_COL+j].zombies[k]->show_a_d());
                         grids[i*MAP_COL+j].zombies[k]->cooldown();
-                        switch (grids[i*MAP_COL+j].zombies[k]->show_type()) {
-                            case zombie:
-                            case conehead:{
-                                if (grids[i*MAP_COL+j].zombies[k]->show_counter()==0) {
-                                    if (grids[i*MAP_COL+j].zombies[k]->find_plant == -1) {
-                                        int ready = grids[i*MAP_COL+j].zombies[k]->walk();
-                                        if (ready) {
-                                            int next = grids[i*MAP_COL+j].zombies[k]->cross_grid(i, j);
-                                            if (next<0) {lose = true; return;}
-                                            grids[i*MAP_COL+j].zombies[k]->set_direction(paths[grids[i*MAP_COL+j].zombies[k]->show_path()][next]);
-                                            grids[next].add_zombie(grids[i*MAP_COL+j].zombies[k]);
-                                            grids[i*MAP_COL+j].del_zombie(k);                                  
-                                        }
+                        
+                        /* The zombie can move or attack */
+                        if (grids[i*MAP_COL+j].zombies[k]->show_counter()==0) {
+                            if (grids[i*MAP_COL+j].zombies[k]->has_throw==0) {
+                                Imp *z = new Imp(grids[i*MAP_COL+j].zombies[k]->show_path());
+                                int target = find_next_n(length[z->show_path()]/4, i, j, z->show_path());
+                                z->set_direction(paths[z->show_path()][target]);
+                                grids[target].add_zombie(z);
+                                grids[i*MAP_COL+j].zombies[k]->has_throw = -2;
+                                continue;
+                            }
+                            /* The zombie is not warlike or cannot find plants, so he moved */
+                            if (!grids[i*MAP_COL+j].zombies[k]->show_warlike() || target == -1) {
+                                int ready = grids[i*MAP_COL+j].zombies[k]->walk();
+                                if (ready) {
+                                    int next = grids[i*MAP_COL+j].zombies[k]->cross_grid(i, j);
+                                    if (next<0) {lose = true; return;}
+                                    grids[i*MAP_COL+j].zombies[k]->set_direction(paths[grids[i*MAP_COL+j].zombies[k]->show_path()][next]);
+                                    grids[next].add_zombie(grids[i*MAP_COL+j].zombies[k]);
+                                    grids[i*MAP_COL+j].del_zombie(k);                                  
+                                }
+                            }
+                            /* The zombie finds plants */
+                            if (target != -1) {
+                                switch (grids[i*MAP_COL+j].zombies[k]->show_type()) {
+                                    case gargantuar: {
+                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());}
+                                        if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());}
+                                        break;
                                     }
-                                    else {
-                                        if (grids[i*MAP_COL+j].plant_p) {grids[i*MAP_COL+j].plant_p->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());}
-                                        else {grids[i*MAP_COL+j].plant_0->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());}
+                                    default: {
+                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());}
+                                        else if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());}
+                                        break;
                                     }
                                 }
-                                break;
                             }
-                            default: break;
                         }
+                        // switch (grids[i*MAP_COL+j].zombies[k]->show_type()) {
+                        //     case zombie:
+                        //     case conehead:
+                        //     case imp:
+                        //     case gargantuar: {
+                        //         if (grids[i*MAP_COL+j].zombies[k]->show_counter()==0) {
+                        //             if (target == -1) {
+                        //                 int ready = grids[i*MAP_COL+j].zombies[k]->walk();
+                        //                 if (ready) {
+                        //                     int next = grids[i*MAP_COL+j].zombies[k]->cross_grid(i, j);
+                        //                     if (next<0) {lose = true; return;}
+                        //                     grids[i*MAP_COL+j].zombies[k]->set_direction(paths[grids[i*MAP_COL+j].zombies[k]->show_path()][next]);
+                        //                     grids[next].add_zombie(grids[i*MAP_COL+j].zombies[k]);
+                        //                     grids[i*MAP_COL+j].del_zombie(k);                                  
+                        //                 }
+                        //             }
+                        //             else {
+                        //                 if (grids[target].plant_p) {
+                        //                     grids[target].plant_p->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());
+                        //                 }
+                        //                 else {
+                        //                     grids[target].plant_0->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());
+                        //                 }
+                        //             }
+                        //         }
+                        //         break;
+                        //     }
+                        //     default: break;
+                        // }
                     }
                 }
             }

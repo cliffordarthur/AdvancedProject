@@ -17,6 +17,8 @@ Sunflower::Sunflower() {
 
     this->sun = 10;
     this->counter = this->speed;
+
+    this->stop_num = plant_table[this->type].stop_num;
 }
 
 int Sunflower::gen_sun() {
@@ -32,6 +34,8 @@ Wallnut::Wallnut() {
     this->attacked = plant_table[this->type].attacked;
     this->p_type = plant_table[this->type].p_type;
     this->find_zombie = -1;
+
+    this->stop_num = plant_table[this->type].stop_num;
 }
 
 Spikeweed::Spikeweed() {
@@ -45,6 +49,7 @@ Spikeweed::Spikeweed() {
     this->find_zombie = -1;
 
     this->counter = this->speed;
+    this->stop_num = plant_table[this->type].stop_num;
 }
 
 Pumpkin::Pumpkin() {
@@ -56,6 +61,8 @@ Pumpkin::Pumpkin() {
     this->attacked = plant_table[this->type].attacked;
     this->p_type = plant_table[this->type].p_type;
     this->find_zombie = -1;
+
+    this->stop_num = plant_table[this->type].stop_num;
 }
 
 Farmer::Farmer() {
@@ -69,6 +76,7 @@ Farmer::Farmer() {
     this->find_zombie = -1;
 
     this->counter = this->speed;
+    this->stop_num = plant_table[this->type].stop_num;
 }
 
 Dryad::Dryad() {
@@ -82,6 +90,7 @@ Dryad::Dryad() {
     this->find_zombie = -1;
 
     this->counter = this->speed;
+    this->stop_num = plant_table[this->type].stop_num;
 }
 
 int Dryad::poison() {
@@ -99,6 +108,7 @@ Cherry::Cherry() {
     this->find_zombie = -1;
 
     this->counter = this->speed;
+    this->stop_num = plant_table[this->type].stop_num;
 }
 
 void Cherry::suicide() {
@@ -116,6 +126,7 @@ Cabbage::Cabbage() {
     this->find_zombie = -1;
 
     this->counter = this->speed;
+    this->stop_num = plant_table[this->type].stop_num;
 }
 
 Bamboo::Bamboo() {
@@ -129,6 +140,7 @@ Bamboo::Bamboo() {
     this->find_zombie = -1;
 
     this->counter = this->speed;
+    this->stop_num = plant_table[this->type].stop_num;
 }
 
 Pea::Pea() {
@@ -142,4 +154,5 @@ Pea::Pea() {
     this->find_zombie = -1;
 
     this->counter = this->speed;
+    this->stop_num = plant_table[this->type].stop_num;
 }

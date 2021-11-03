@@ -159,21 +159,35 @@ void Game::gen_sun() {
 
 void Game::gen_zombie() {
     if (rand()%(FPS*5)==0) {
-        int type = zombie;
-        if (rand()%5 == 0) type = conehead;  
-        int target;
+        int type = gargantuar;
+        // int tmp = rand()%100;
+        // if (0<=tmp && tmp<50) type = zombie;
+        // else if (50<=tmp && tmp<90) type = conehead;
+        // else type = gargantuar;
+        // if (rand()%5 == 0) type = conehead;  
+        int target, length;
         switch (type) {
             case zombie: {
                 Zombie *z = new Zombie;
                 target = map.start[z->show_path()];
-                z->set_direction(map.paths[z->show_path()][target]);
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
                 map.grids[target].add_zombie(z);
                 break;
             }
             case conehead: {
                 Conehead *z = new Conehead;
                 target = map.start[z->show_path()];
-                z->set_direction(map.paths[z->show_path()][target]);
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
+                map.grids[target].add_zombie(z);
+                break;
+            }
+            case gargantuar: {
+                Gargantuar *z = new Gargantuar;
+                target = map.start[z->show_path()];
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
                 map.grids[target].add_zombie(z);
                 break;
             }
@@ -185,13 +199,14 @@ void Game::gen_zombie() {
 void Game::cheat_gen_zombie(int num) {
     for (int i = 0; i < num; i++) {
         int type = zombie;
-        int target;
+        int target, length;
         if (rand()%5 == 0) type = conehead;
         switch(type) {
             case zombie: {
                 Zombie *z = new Zombie;
                 target = map.start[z->show_path()];
-                z->set_direction(map.paths[z->show_path()][target]);
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
                 z->be_attacked(-9*z->show_HP());
                 z->set_total_HP(z->show_HP());
                 map.grids[target].add_zombie(z);
@@ -200,7 +215,8 @@ void Game::cheat_gen_zombie(int num) {
             case conehead: {
                 Conehead *z = new Conehead;
                 target = map.start[z->show_path()];
-                z->set_direction(map.paths[z->show_path()][target]);
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
                 z->be_attacked(-9*z->show_HP());
                 z->set_total_HP(z->show_HP());
                 map.grids[target].add_zombie(z);
@@ -327,6 +343,7 @@ int Game::read_map(int choice) {
                             if (!(lastx > tmpx && lasty == tmpy)) return -3;
                             for (int l = lastx; l > tmpx ; l--) {
                                 map.paths[i][l*MAP_COL+tmpy] = lastd;
+                                map.length[i]++;
                             }
                             break;
                         }
@@ -334,6 +351,7 @@ int Game::read_map(int choice) {
                             if (!(lastx < tmpx && lasty == tmpy)) return -3;
                             for (int l = lastx; l < tmpx ; l++) {
                                 map.paths[i][l*MAP_COL+tmpy] = lastd;
+                                map.length[i]++;
                             }
                             break;
                         }
@@ -341,6 +359,7 @@ int Game::read_map(int choice) {
                             if (!(lasty > tmpy && lastx == tmpx)) return -3;
                             for (int l = lasty; l > tmpy ; l--) {
                                 map.paths[i][tmpx*MAP_COL+l] = lastd;
+                                map.length[i]++;
                             }
                             break;
                         }
@@ -348,11 +367,13 @@ int Game::read_map(int choice) {
                             if (!(lasty < tmpy && lastx == tmpx)) return -3; 
                             for (int l = lasty; l < tmpy ; l++) {
                                 map.paths[i][tmpx*MAP_COL+l] = lastd;
+                                map.length[i]++;
                             }
                             break;
                         }
                         case diend: {
                             map.paths[i][lastx*MAP_COL+lasty] = lastd;
+                            map.length[i]++;
                             break;
                         }
                         default: return -3;

@@ -12,19 +12,20 @@ struct Planttable{
     int range;
     bool attacked;//FIXME: in zombies
     int p_type;
+    int stop_num;
 }static plant_table[] = {
-    {"    dryad",     dryad, 100, 150, 12*FPS,   5,  2*FPS,  1,  true, p_remote},
-    {"sunflower", sunflower,  80,  50,  3*FPS,   0,  3*FPS,  0,  true,  p_other},
-    {"   cherry",    cherry, 999, 150, 12*FPS, 500,  1*FPS,  1,  true,  p_other},
-    {"  pumpkin",   pumpkin, 500, 125, 12*FPS,   0,      1,  0,  true,  p_other},
-    {"  wallnut",   wallnut, 500,  75, 10*FPS,   0,      1,  0,  true,  p_melle},
-    {"spikeweed", spikeweed,  30, 100,  5*FPS,  10,  1*FPS,  0, false,  p_melle},
-    {"   bamboo",    bamboo, 150, 100,  8*FPS,  20,  1*FPS,  2,  true,  p_melle},//
-    {"  cabbage",   cabbage, 150, 100,  8*FPS,  20,  2*FPS,  3,  true,  p_melle},//
-    {"   farmer",    farmer, 100, 450, 30*FPS,   0, 12*FPS,  1,  true, p_remote},
-    {"      pea",       pea, 100, 100,  6*FPS,  10,  1*FPS,  2,  true, p_remote},//
+    {"    dryad",     dryad, 100, 150, 12*FPS,   5,  2*FPS,  1,  true, p_remote, ZOMBIE_NUM},
+    {"sunflower", sunflower,  80,  50,  3*FPS,   0,  3*FPS,  0,  true,  p_other, ZOMBIE_NUM},
+    {"   cherry",    cherry, 999, 150, 12*FPS, 500,  1*FPS,  1,  true,  p_other, ZOMBIE_NUM},
+    {"  pumpkin",   pumpkin, 500, 125, 12*FPS,   0,      1,  0,  true,  p_other, ZOMBIE_NUM},
+    {"  wallnut",   wallnut, 500,  75, 10*FPS,   0,      1,  0,  true,  p_melle, ZOMBIE_NUM},
+    {"spikeweed", spikeweed,  30, 100,  5*FPS,  10,  1*FPS,  0, false,  p_melle,          0},
+    {"   bamboo",    bamboo, 150, 100,  8*FPS,  20,  1*FPS,  2,  true,  p_melle, ZOMBIE_NUM},//
+    {"  cabbage",   cabbage, 150, 100,  8*FPS,  20,  2*FPS,  3,  true,  p_melle, ZOMBIE_NUM},//
+    {"   farmer",    farmer, 100, 450, 30*FPS,   0, 12*FPS,  1,  true, p_remote, ZOMBIE_NUM},
+    {"      pea",       pea, 100, 100,  6*FPS,  10,  1*FPS,  2,  true, p_remote, ZOMBIE_NUM},//
 
-    {"   shovel",    shovel,   1,   0,      0,   0,      0,  0, false,  p_other},
+    {"   shovel",    shovel,   1,   0,      0,   0,      0,  0, false,  p_other,          0},
 };
 
 const int plant_num = sizeof(plant_table)/sizeof(plant_table[0]);
@@ -35,8 +36,10 @@ protected:
     int HP;
     int damage, speed, range;
     int counter;
-    bool attacked; //whether can be attacked
+    bool attacked; // FIXME:whether can be attacked
+    
     int p_type;
+    int stop_num;
 public:
     Plant(){}
     virtual void suicide(){}
@@ -50,6 +53,8 @@ public:
     int show_counter()const{return counter;}
     int show_range()const{return range;}
     bool show_attacked()const{return attacked;} 
+    int show_s_n()const{return stop_num;}
+
     void be_attacked(int h){HP-=h; if (HP<0) HP=0;}
 };
 

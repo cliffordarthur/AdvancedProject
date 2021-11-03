@@ -24,8 +24,8 @@ extern int a_path_num;
 // require at least R_LINES lines and R_COLS columns
 // R_LINES > MAP_LINE * (5+1) + SHOP_LINE + INFO_LINE
 // R_COLS > MAP_COL * (20+1)
-#define R_LINES 45
-#define R_COLS 100
+#define R_LINES 52
+#define R_COLS 170
 
 // some keys in curses
 #define KEYENTER 10
@@ -63,7 +63,7 @@ enum COLORS{WHITE_BLACK, RED_BLACK, GREEN_BLACK, YELLOW_BLACK, BLUE_BLACK, MAGEN
 
 enum Plantname{dryad, sunflower, cherry, pumpkin, wallnut, spikeweed, bamboo, cabbage, farmer, pea, shovel};
 
-enum Zombiename{zombie, conehead};//TODO: polevault, newspaper, ...
+enum Zombiename{zombie, conehead, imp, gargantuar};
 
 enum Directions{diup, didown, dileft, diright, diend};
 

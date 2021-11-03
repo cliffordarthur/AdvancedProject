@@ -24,6 +24,7 @@ int Zombies::cross_grid(int i, int j) {
         case diend: {next = -1; break;}
         default: assert(0);
     }
+    remain_grid--;
     return next;
 }
 
@@ -44,8 +45,15 @@ Zombie::Zombie() {
 
     this->path = rand()%g_path_num;
     this->direction = 0;
+
     this->crazy = false;
     this->poison = 0;
+    this->encourage = false;
+
+    this->range = zombie_table[this->type].range;
+    this->a_d = zombie_table[this->type].attack_direction;
+
+    this->warlike = zombie_table[this->type].warlike;
 }
 
 Conehead::Conehead() {
@@ -60,6 +68,59 @@ Conehead::Conehead() {
 
     this->path = rand()%g_path_num;
     this->direction = 0;
+
     this->crazy = false;
     this->poison = 0;
+    this->encourage = false;
+
+    this->range = zombie_table[this->type].range;
+    this->a_d = zombie_table[this->type].attack_direction;
+
+    this->warlike = zombie_table[this->type].warlike;
+}
+
+Imp::Imp(int p) {
+    this->type = imp;
+    this->total_HP = zombie_table[this->type].HP;
+    this->HP = this->total_HP;
+    this->damage = zombie_table[this->type].damage;
+    this->speed = zombie_table[this->type].speed;
+    this->counter = this->speed;
+    this->stride = zombie_table[this->type].stride;
+    this->scounter = this->stride;
+
+    this->path = p;
+    this->direction = 0;
+
+    this->crazy = false;
+    this->poison = 0;
+    this->encourage = false;
+
+    this->range = zombie_table[this->type].range;
+    this->a_d = zombie_table[this->type].attack_direction;
+
+    this->warlike = zombie_table[this->type].warlike;
+}
+
+Gargantuar::Gargantuar() {
+    this->type = gargantuar;
+    this->total_HP = zombie_table[this->type].HP;
+    this->HP = this->total_HP;
+    this->damage = zombie_table[this->type].damage;
+    this->speed = zombie_table[this->type].speed;
+    this->counter = this->speed;
+    this->stride = zombie_table[this->type].stride;
+    this->scounter = this->stride;
+
+    this->path = rand()%g_path_num;
+    this->direction = 0;
+
+    this->crazy = false;
+    this->poison = 0;
+    this->encourage = false;
+
+    this->range = zombie_table[this->type].range;
+    this->a_d = zombie_table[this->type].attack_direction;
+
+    this->warlike = zombie_table[this->type].warlike;
 }
