@@ -33,7 +33,6 @@ void Game::init() {
     init_pair(BLUE_BLACK, COLOR_BLUE, COLOR_BLACK);
     init_pair(MAGENTA_BLACK, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(CYAN_BLACK, COLOR_CYAN, COLOR_BLACK);
-    
     if ((LINES < R_LINES)||(COLS < R_COLS)) {
         endwin();
         printf("In order to display the graph completely, the length and width of your terminal "\
@@ -144,7 +143,7 @@ void Game::input(char ch) {
             break;
         }
         case 'z': {
-            cheat_gen_zombie(1);
+            cheat_gen_zombie(20);
             break;
         }
         default: break;
@@ -244,11 +243,11 @@ void Game::gen_zombie() {
 
 void Game::cheat_gen_zombie(int num) {
     for (int i = 0; i < num; i++) {
-        int type = zombie;
+        int type = rand()%zombie_num;
         int target, length;
-        if (rand()%5 == 0) type = conehead;
-        switch(type) {
-            case zombie: {
+        switch (type) {
+            case imp:
+            case zombie:{
                 Zombie *z = new Zombie;
                 target = map.start[z->show_path()];
                 length = map.length[z->show_path()];
@@ -258,7 +257,7 @@ void Game::cheat_gen_zombie(int num) {
                 map.grids[target].add_zombie(z);
                 break;
             }
-            case conehead: {
+            case conehead:{
                 Conehead *z = new Conehead;
                 target = map.start[z->show_path()];
                 length = map.length[z->show_path()];
@@ -268,8 +267,69 @@ void Game::cheat_gen_zombie(int num) {
                 map.grids[target].add_zombie(z);
                 break;
             }
-            default: break;
+            case gargantuar:{
+                Gargantuar *z = new Gargantuar;
+                target = map.start[z->show_path()];
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
+                z->be_attacked(-9*z->show_HP());
+                z->set_total_HP(z->show_HP());
+                map.grids[target].add_zombie(z);
+                break;
+            }
+            case necromancer:{
+                Necromancer *z = new Necromancer;
+                target = map.start[z->show_path()];
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
+                z->be_attacked(-9*z->show_HP());
+                z->set_total_HP(z->show_HP());
+                map.grids[target].add_zombie(z);
+                break;
+            }
+            case catapult:{
+                Catapult *z = new Catapult;
+                target = map.start[z->show_path()];
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
+                z->be_attacked(-9*z->show_HP());
+                z->set_total_HP(z->show_HP());
+                map.grids[target].add_zombie(z);
+                break;
+            }
+            case balloon:{
+                Balloon *z = new Balloon;
+                target = map.start[z->show_path()];
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
+                z->be_attacked(-9*z->show_HP());
+                z->set_total_HP(z->show_HP());
+                map.grids[target].add_zombie(z);
+                break;
+            }
+            case bomber:{
+                Bomber *z = new Bomber;
+                target = map.start[z->show_path()];
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
+                z->be_attacked(-9*z->show_HP());
+                z->set_total_HP(z->show_HP());
+                map.grids[target].add_zombie(z);
+                break;
+            }
+            case frostwyrm:{
+                Frostwyrm *z = new Frostwyrm;
+                target = map.start[z->show_path()];
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
+                z->be_attacked(-9*z->show_HP());
+                z->set_total_HP(z->show_HP());
+                map.grids[target].add_zombie(z);
+                break;
+            }
+            default:break;
         }
+        
     }
 }
 
@@ -309,7 +369,7 @@ void Game::show_help() {
         else if (!i) break;
     }
     printc(WHITE_BLACK, "\nBesides, you can press ");
-    printc(YELLOW_BLACK, "0 ");
+    printc(YELLOW_BLACK, "- ");
     printc(WHITE_BLACK, "to use the ");
     printc(GREEN_BLACK, "shovel\n\n");
 

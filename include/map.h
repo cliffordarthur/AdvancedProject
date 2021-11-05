@@ -16,7 +16,7 @@ class Grid{
     Zombies *zombies[ZOMBIE_NUM];
 public:
     Grid();
-    void set_type(int t){if (type!=g_z_base) type = t;}
+    void set_type(int t){if (type!=g_z_base) type = t;} // is g_z_base necessary?
     int show_type() const {return type;}
     void set_coordinate(int x0, int y0);
     bool can_plant(int c, int tmp);
@@ -29,7 +29,7 @@ public:
     void free_zombie(int z);
 
     void add_fort();
-    void cheat_kill();void show_num(){std::cout<<z_num<<"  "<<a_z_num<<"\n";}
+    void cheat_kill();
     friend class Map;
 };
 
