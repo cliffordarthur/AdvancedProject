@@ -10,22 +10,25 @@ struct Planttable{
     int damage;
     int speed;//attack
     int range;
-    bool attacked;//FIXME: in zombies
     int p_type;
     int stop_num;
+    int attack_target;
 }static plant_table[] = {
-    {"    dryad",     dryad, 100, 150, 12*FPS,   5,  2*FPS,  1,  true, p_remote, ZOMBIE_NUM},
-    {"sunflower", sunflower,  80,  50,  3*FPS,   0,  3*FPS,  0,  true,  p_other, ZOMBIE_NUM},
-    {"   cherry",    cherry, 999, 150, 12*FPS, 500,  1*FPS,  1,  true,  p_other, ZOMBIE_NUM},
-    {"  pumpkin",   pumpkin, 500, 125, 12*FPS,   0,      1,  0,  true,  p_other, ZOMBIE_NUM},
-    {"  wallnut",   wallnut, 500,  75, 10*FPS,   0,      1,  0,  true,  p_melle, ZOMBIE_NUM},
-    {"spikeweed", spikeweed,  30, 100,  5*FPS,  10,  1*FPS,  0, false,  p_melle,          0},
-    {"   bamboo",    bamboo, 150, 100,  8*FPS,  20,  1*FPS,  2,  true,  p_melle, ZOMBIE_NUM},//
-    {"  cabbage",   cabbage, 150, 100,  8*FPS,  20,  2*FPS,  3,  true,  p_melle, ZOMBIE_NUM},//
-    {"   farmer",    farmer, 100, 450, 30*FPS,   0, 12*FPS,  1,  true, p_remote, ZOMBIE_NUM},
-    {"      pea",       pea, 100, 100,  6*FPS,  10,  1*FPS,  2,  true, p_remote, ZOMBIE_NUM},//
+    {"    dryad",     dryad, 100, 150, 12*FPS,   5,  2*FPS,  1, p_remote, ZOMBIE_NUM,   z_both},
 
-    {"   shovel",    shovel,   1,   0,      0,   0,      0,  0, false,  p_other,          0},
+    {"sunflower", sunflower,  80,  50,  3*FPS,   0,  3*FPS,  0,  p_other, ZOMBIE_NUM, z_ground},
+    {"   cherry",    cherry, 999, 150, 12*FPS, 500,  1*FPS,  1,  p_other, ZOMBIE_NUM,   z_both},
+    {"  pumpkin",   pumpkin, 500, 125, 12*FPS,   0,      1,  0,  p_other, ZOMBIE_NUM, z_ground},
+
+    {"  wallnut",   wallnut, 500,  75, 10*FPS,   0,      1,  0,  p_melle, ZOMBIE_NUM, z_ground},
+    {"spikeweed", spikeweed,  30, 100,  5*FPS,  10,  1*FPS,  0,  p_melle,          0, z_ground},
+    {"   bamboo",    bamboo, 150, 100,  8*FPS,  20,  1*FPS,  0,  p_melle, ZOMBIE_NUM, z_ground},//
+    {"  cabbage",   cabbage, 150, 100,  8*FPS,  10,  FPS/2,  0,  p_melle, ZOMBIE_NUM,   z_both},//
+
+    {"   farmer",    farmer, 100, 450, 30*FPS,   0, 12*FPS,  1, p_remote, ZOMBIE_NUM, z_ground},
+    {"      pea",       pea, 100, 100,  6*FPS,  10,  1*FPS,  2, p_remote, ZOMBIE_NUM, z_ground},//
+
+    {"   shovel",    shovel,   1,   0,      0,   0,      0,  0, p_other,          0, z_ground},
 };
 
 const int plant_num = sizeof(plant_table)/sizeof(plant_table[0]);
@@ -36,14 +39,16 @@ protected:
     int HP;
     int damage, speed, range;
     int counter;
-    bool attacked; // FIXME:whether can be attacked
     
     int p_type;
     int stop_num;
+    int a_target;
+    int freeze;
 public:
-    Plant(){}
+    Plant():freeze(0){}
     virtual void suicide(){}
     virtual int poison(){return 0;}
+    virtual int gen_sun()const{return 0;}
     int find_zombie;
     void cooldown();
     void counter_plus(){counter++;}
@@ -52,17 +57,20 @@ public:
     int show_HP()const{return HP;}
     int show_counter()const{return counter;}
     int show_range()const{return range;}
-    bool show_attacked()const{return attacked;} 
     int show_s_n()const{return stop_num;}
+    int show_a_t()const{return a_target;}
 
     void be_attacked(int h){HP-=h; if (HP<0) HP=0;}
+    void be_freezed(int f){if (!freeze) {speed*=2;} freeze = FPS*f;}
+    int show_freeze()const {return freeze;}
+    void check_freeze();
 };
 
 class Sunflower: public Plant{
     int sun;
 public:
     Sunflower();
-    int gen_sun();
+    int gen_sun()const{return sun;}
 };
 
 class Wallnut: public Plant{

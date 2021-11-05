@@ -12,6 +12,7 @@ class Grid{
     int p_num;
 
     int z_num;
+    int a_z_num;
     Zombies *zombies[ZOMBIE_NUM];
 public:
     Grid();
@@ -28,7 +29,7 @@ public:
     void free_zombie(int z);
 
     void add_fort();
-    void cheat_kill();
+    void cheat_kill();void show_num(){std::cout<<z_num<<"  "<<a_z_num<<"\n";}
     friend class Map;
 };
 
@@ -48,9 +49,9 @@ public:
     void update(int& sun, bool& lose, int& score);
     void draw(int cursor_x, int cursor_y);
     
-    // int find_enemy(bool is_plant, int r, int x, int y);
-    int find_zombies(int r, int x, int y);
-    int find_plants(int r, int x, int y, int p, bool a_d);
+    int find_zombies(int x, int y, Plant *p);
+    int find_plants(int x, int y, Zombies *z);
+    // int find_plants(int r, int x, int y, int p, bool a_d);
     int find_next_n(int n, int x, int y, int p);
     
     void cheat_kill() {for (int i = 0; i < grids.size(); i++) grids[i].cheat_kill();}

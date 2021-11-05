@@ -144,7 +144,7 @@ void Game::input(char ch) {
             break;
         }
         case 'z': {
-            cheat_gen_zombie(10);
+            cheat_gen_zombie(1);
             break;
         }
         default: break;
@@ -159,12 +159,18 @@ void Game::gen_sun() {
 
 void Game::gen_zombie() {
     if (rand()%(FPS*5)==0) {
-        int type = gargantuar;
-        // int tmp = rand()%100;
-        // if (0<=tmp && tmp<50) type = zombie;
-        // else if (50<=tmp && tmp<90) type = conehead;
-        // else type = gargantuar;
-        // if (rand()%5 == 0) type = conehead;  
+        int type = zombie;
+
+        int tmp = rand()%100;
+        if (tmp<30) type = zombie;//30
+        else if (tmp<50) type = conehead;//20
+        else if (tmp<55) type = gargantuar;//5
+        else if (tmp<60) type = necromancer;//5
+        else if (tmp<70) type = catapult;//10
+        else if (tmp<85) type = balloon;//15
+        else if (tmp<95) type = bomber;//10
+        else type = frostwyrm;//5
+
         int target, length;
         switch (type) {
             case zombie: {
@@ -190,6 +196,46 @@ void Game::gen_zombie() {
                 z->set_direction(map.paths[z->show_path()][target], length);
                 map.grids[target].add_zombie(z);
                 break;
+            }
+            case necromancer: {
+                Necromancer *z = new Necromancer;
+                target = map.start[z->show_path()];
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
+                map.grids[target].add_zombie(z);
+                break;                
+            }
+            case catapult: {
+                Catapult *z = new Catapult;
+                target = map.start[z->show_path()];
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
+                map.grids[target].add_zombie(z);
+                break;
+            }
+            case balloon: {
+                Balloon *z = new Balloon;
+                target = map.start[z->show_path()];
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
+                map.grids[target].add_zombie(z);
+                break; 
+            }
+            case bomber: {
+                Bomber *z = new Bomber;
+                target = map.start[z->show_path()];
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
+                map.grids[target].add_zombie(z);
+                break; 
+            }
+            case frostwyrm: {
+                Frostwyrm *z = new Frostwyrm;
+                target = map.start[z->show_path()];
+                length = map.length[z->show_path()];
+                z->set_direction(map.paths[z->show_path()][target], length);
+                map.grids[target].add_zombie(z);
+                break;                
             }
             default: break;
         }   
@@ -286,7 +332,7 @@ void Game::show_result() {
     printc(YELLOW_BLACK, "%d", score);
 
     refresh();
-    sleep(1);
+    sleep(5);
     endwin();
     
     if (lose) printf("You lost the game, and your score is %d\n", score);

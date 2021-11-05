@@ -63,13 +63,15 @@ enum COLORS{WHITE_BLACK, RED_BLACK, GREEN_BLACK, YELLOW_BLACK, BLUE_BLACK, MAGEN
 
 enum Plantname{dryad, sunflower, cherry, pumpkin, wallnut, spikeweed, bamboo, cabbage, farmer, pea, shovel};
 
-enum Zombiename{zombie, conehead, imp, gargantuar};
+enum Zombiename{zombie, conehead, imp, gargantuar, necromancer, catapult, balloon, bomber, frostwyrm};
 
 enum Directions{diup, didown, dileft, diright, diend};
 
 enum Grid_type{melle, remote, mr, g_z_base};
 
 enum Plant_type{p_melle, p_remote, p_other};
+
+enum Zombie_type{z_ground, z_air, z_both};
 
 enum Spec_type{fort, d_fort};
 

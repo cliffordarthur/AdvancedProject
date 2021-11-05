@@ -6,6 +6,7 @@ Grid::Grid(){
     has_pumpkin = false;
     p_num = 0;
     z_num = 0;
+    a_z_num = 0;
     type = remote;
     for (int i = 0; i < ZOMBIE_NUM; i++) zombies[i] = NULL;
 }
@@ -109,6 +110,7 @@ int Grid::use_shovel(int c) {
 void Grid::add_zombie(Zombies *z){
     if (z_num < ZOMBIE_NUM) {
         z_num++; 
+        if (z->show_z_type()==z_air) a_z_num++;
         for (int i = 0; i < ZOMBIE_NUM; i++) {
             if (this->zombies[i]==NULL){
                 this->zombies[i] = z;
@@ -119,11 +121,13 @@ void Grid::add_zombie(Zombies *z){
 }
 
 void Grid::del_zombie(int z) {
+    if (zombies[z]->show_z_type()==z_air) a_z_num--;
     zombies[z] = NULL;
     z_num--;
 }
 
 void Grid::free_zombie(int z) {
+    if (zombies[z]->show_z_type()==z_air) a_z_num--;
     delete zombies[z];
     zombies[z] = NULL;
     z_num--;

@@ -5,6 +5,7 @@ int g_path_num = 1;
 int a_path_num = 1;
 
 int main() {
+    srand((unsigned)time(NULL)); 
     Game game;
     game.init();
     game.start();
