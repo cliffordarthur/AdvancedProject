@@ -29,7 +29,7 @@ int Shop::buy() {
 }
 
 int Shop::ret_sun(int r) {
-    return menu[r].costs/2;
+    return menu[r].costs/2;//FIXME: may be a bug
 }
 
 void Shop::update() {

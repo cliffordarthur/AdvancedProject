@@ -3,12 +3,19 @@
 Grid::Grid(){
     plant_0 = NULL;
     plant_p = NULL;
-    has_pumpkin = false;
+    // has_pumpkin = false;
     p_num = 0;
     z_num = 0;
     a_z_num = 0;
     type = remote;
     for (int i = 0; i < ZOMBIE_NUM; i++) zombies[i] = NULL;
+}
+
+int Grid::show_plant_type() const{
+    if (!plant_0) {
+        return -1;
+    }
+    return plant_0->show_type();
 }
 
 void Grid::set_coordinate(int x0, int y0) {
@@ -22,9 +29,9 @@ bool Grid::can_plant(int c, int tmp) {
         if ((p_num == 0)||(tmp == 1 && p_num == 1)) return false;
     }
     else if (c == pumpkin) {
-        if (has_pumpkin) return false;
+        if (has_pumpkin()) return false;
     }
-    else if ((!has_pumpkin && p_num == 1) || (p_num > 1)) return false;
+    else if ((!has_pumpkin() && p_num == 1) || (p_num > 1)) return false;
     else if ((type==melle && plant_table[c].p_type==p_remote) || (type==remote && plant_table[c].p_type==p_melle)) return false;
     return true;
 }
@@ -32,7 +39,7 @@ bool Grid::can_plant(int c, int tmp) {
 void Grid::add_plant(int c) {
     if (c == pumpkin) {
         p_num++;
-        has_pumpkin = true;
+        // has_pumpkin = true;
         Pumpkin *p = new Pumpkin;
         this->plant_p = p;
     }
@@ -84,28 +91,43 @@ void Grid::add_plant(int c) {
     else return;//TODO: 
 }
 
-int Grid::use_shovel(){
+void Grid::use_shovel(int c) {
     p_num--;
-    if (has_pumpkin) {
-        has_pumpkin = false;
+    if (c == pumpkin) {
+        assert(has_pumpkin());
         delete this->plant_p;
         this->plant_p = NULL;
-        return pumpkin;
     }
     else {
-        int tmp = this->plant_0->show_type();
+        assert(c==show_plant_type());
         delete this->plant_0;
         this->plant_0 = NULL;
-        return tmp;
     }
+    // return c;
 }
 
-int Grid::use_shovel(int c) {
-    p_num--;
-    delete this->plant_0;
-    this->plant_0 = NULL;
-    return c;
-}
+// int Grid::use_shovel(){
+//     p_num--;
+//     if (has_pumpkin()) {
+//         // has_pumpkin = false;
+//         delete this->plant_p;
+//         this->plant_p = NULL;
+//         return pumpkin;
+//     }
+//     else {
+//         int tmp = this->plant_0->show_type();
+//         delete this->plant_0;
+//         this->plant_0 = NULL;
+//         return tmp;
+//     }
+// }
+
+// int Grid::use_shovel(int c) {
+//     p_num--;
+//     delete this->plant_0;
+//     this->plant_0 = NULL;
+//     return c;
+// }
 
 void Grid::add_zombie(Zombies *z){
     if (z_num < ZOMBIE_NUM) {
@@ -135,7 +157,7 @@ void Grid::free_zombie(int z) {
 
 void Grid::add_fort() {
     p_num++;
-    has_pumpkin = true;
+    // has_pumpkin = true;
     Pumpkin *p = new Pumpkin;
     p->be_attacked(-9*p->show_HP());
     this->plant_p = p;

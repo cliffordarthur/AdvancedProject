@@ -28,7 +28,7 @@ struct Planttable{
     {"   farmer",    farmer, 100, 450, 30*FPS,   0, 12*FPS,  1, p_remote, ZOMBIE_NUM, z_ground},
     {"      pea",       pea, 100, 100,  6*FPS,  10,  1*FPS,  2, p_remote, ZOMBIE_NUM, z_ground},//
 
-    {"   shovel",    shovel,   1,   0,      0,   0,      0,  0, p_other,          0, z_ground},
+    {"   shovel",    shovel,   1,   0,      0,   0,      0,  0,  p_other,          0, z_ground},
 };
 
 const int plant_num = sizeof(plant_table)/sizeof(plant_table[0]);

@@ -70,7 +70,7 @@ int Map::find_plants(int x, int y, Zombies *z) {
                 for (int j = -rr; j <= rr; j++) {
                     if (y + j < 0 || y + j >= MAP_COL || (-rr+1<=i && i<=rr-1 && -rr+1<=j && j<=rr-1)) continue;
                     target = (x+i)*MAP_COL+y+j;
-                    if (grids[target].p_num && (grids[target].has_pumpkin || z->show_type() == gargantuar || grids[target].plant_0->show_s_n())) return target;   
+                    if (grids[target].p_num && (grids[target].has_pumpkin() || z->show_type() == gargantuar || grids[target].plant_0->show_s_n())) return target;   
                 }
             }
         }
@@ -79,7 +79,7 @@ int Map::find_plants(int x, int y, Zombies *z) {
         int r = z->show_range();
         while (r>=0) {
             target = x*MAP_COL+y;
-            if (grids[target].p_num && (grids[target].has_pumpkin || z->show_type() == gargantuar || grids[target].plant_0->show_s_n())) return target;//FIXME: garg... can attack spikeweed!
+            if (grids[target].p_num && (grids[target].has_pumpkin() || z->show_type() == gargantuar || grids[target].plant_0->show_s_n())) return target;//FIXME: garg... can attack spikeweed!
             int d = paths[z->show_path()][target];
             switch (d) {
                 case    diup: x--; break;
@@ -120,13 +120,13 @@ void Map::update(int& sun, bool& lose, int& score) {
             }
             if (grids[i*MAP_COL+j].plant_p) {
                 if (grids[i*MAP_COL+j].plant_p->show_HP() <= 0) {
-                    grids[i*MAP_COL+j].use_shovel();
+                    grids[i*MAP_COL+j].use_shovel(pumpkin);
                 }
             }
             if (grids[i*MAP_COL+j].plant_0) {
                 if (grids[i*MAP_COL+j].plant_0->show_freeze()) {grids[i*MAP_COL+j].plant_0->check_freeze();}
                 if (grids[i*MAP_COL+j].plant_0->show_HP() <= 0) {
-                    grids[i*MAP_COL+j].use_shovel(1);
+                    grids[i*MAP_COL+j].use_shovel(grids[i*MAP_COL+j].show_plant_type());
                 }
                 else{
                     grids[i*MAP_COL+j].plant_0->find_zombie = find_zombies(i, j, grids[i*MAP_COL+j].plant_0);

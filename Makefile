@@ -5,16 +5,23 @@ deps = $(shell find ./include/ -name "*.h")
 prom = $(build_dir)/$(notdir $(CURDIR))
 obj = $(src:./src/%.cpp=$(build_dir)/%.o)
 
+CURSES = -lcurses
+CXXFLAGS = $(shell wx-config --cxxflags)
+LIBS = $(shell wx-config --libs)
+
 $(prom): $(obj) $(build_dir)
-	@$(cc) -o $(prom) $(obj) -lcurses
+	$(cc) -o $(prom) $(obj) $(CXXFLAGS)
+# $(cc) -o $(prom) $(obj) $(CURSES)
 
 .PHONY: run clean count
 run: $(obj)
-	@$(cc) -o $(prom) $(obj) -lcurses && $(prom)
+	$(cc) $(CXXFLAGS) -o $(prom) $(obj) $(LIBS) && $(prom)
+# $(cc) -o $(prom) $(obj) $(CURSES) && $(prom)
 
 $(build_dir)/%.o: ./src/%.cpp $(deps)
 	@mkdir -p $(dir $@)
-	@$(cc) -c $< -o $@
+	@$(cc) $(CXXFLAGS) -c $< -o $@
+# @$(cc) -c $< -o $@
 
 clean: 
 	rm -rf $(build_dir)

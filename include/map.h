@@ -2,13 +2,14 @@
 #include "common.h"
 #include "plant.h"
 #include "zombie.h"
+#include "shape.h"
 
 class Grid{
     int type; /*melle or remote grids*/
     int x, y;
     Plant *plant_0;
     Plant *plant_p;
-    bool has_pumpkin;
+    // bool has_pumpkin;
     int p_num;
 
     int z_num;
@@ -16,13 +17,15 @@ class Grid{
     Zombies *zombies[ZOMBIE_NUM];
 public:
     Grid();
+    bool has_pumpkin()const {return plant_p;}
+    int show_plant_type()const;
     void set_type(int t){if (type!=g_z_base) type = t;} // is g_z_base necessary?
     int show_type() const {return type;}
     void set_coordinate(int x0, int y0);
     bool can_plant(int c, int tmp);
     void add_plant(int c);
-    int use_shovel();
-    int use_shovel(int c);
+    // int use_shovel();
+    void use_shovel(int c);
 
     void add_zombie(Zombies* z);
     void del_zombie(int z);
@@ -56,4 +59,5 @@ public:
     
     void cheat_kill() {for (int i = 0; i < grids.size(); i++) grids[i].cheat_kill();}
     friend class Game;
+    friend class Board;
 };

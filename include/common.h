@@ -1,6 +1,11 @@
 #pragma once
+#include <wx/wxprec.h>
+#ifndef WX_PRECOMP
+    #include <wx/wx.h>
+#endif
+
 #include <stdio.h>
-#include <curses.h>
+// #include <curses.h>
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
@@ -39,17 +44,17 @@ extern int a_path_num;
 // FPS
 #define FPS 30
 // print with color
-#define printc(color, format, ...)\
-    do {attron(COLOR_PAIR(color));\
-    printw(format, ## __VA_ARGS__);\
-    attroff(COLOR_PAIR(color));} while(0);\
+// #define printc(color, format, ...)\
+//     do {attron(COLOR_PAIR(color));\
+//     printw(format, ## __VA_ARGS__);\
+//     attroff(COLOR_PAIR(color));} while(0);\
 
-inline void printnc(int n, int color, const char* s) {
-    while (n) {
-        printc(color, s);
-        n--;
-    }
-}
+// inline void printnc(int n, int color, const char* s) {
+//     while (n) {
+//         printc(color, s);
+//         n--;
+//     }
+// }
 
 inline int max(int a, int b) {
     return (a>b)?a:b;
@@ -74,4 +79,19 @@ enum Plant_type{p_melle, p_remote, p_other};
 enum Zombie_type{z_ground, z_air, z_both};
 
 enum Spec_type{fort, d_fort};
+
+// P3
+// #define SHOW_COORD
+
+#define DOCHEAT
+
+#define MAP_BEGIN_X 150
+#define MAP_BEGIN_Y 140
+#define GRID_SIZE 120
+
+#define RECOMMEMD_MAX_LINE 6
+#define RECOMMEMD_MAX_COLS 10
+
+enum wxEVENT_ID {MAP_1 = wxID_HIGHEST + 1, MAP_2, 
+    ID_Pause, ID_AS, ID_NC, ID_AE, ID_KA, SHOP_0};
 
