@@ -18,6 +18,7 @@ void Plant::check_freeze() {
 Sunflower::Sunflower() {
     this->type = sunflower;
     this->HP = plant_table[this->type].HP;
+    this->total_HP = plant_table[this->type].HP;
     this->damage = plant_table[this->type].damage;
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;
@@ -34,6 +35,7 @@ Sunflower::Sunflower() {
 Wallnut::Wallnut() {
     this->type = wallnut;
     this->HP = plant_table[this->type].HP;
+    this->total_HP = plant_table[this->type].HP;
     this->damage = plant_table[this->type].damage;
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;
@@ -47,6 +49,7 @@ Wallnut::Wallnut() {
 Spikeweed::Spikeweed() {
     this->type = spikeweed;
     this->HP = plant_table[this->type].HP;
+    this->total_HP = plant_table[this->type].HP;
     this->damage = plant_table[this->type].damage;
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;
@@ -61,6 +64,7 @@ Spikeweed::Spikeweed() {
 Pumpkin::Pumpkin() {
     this->type = pumpkin;
     this->HP = plant_table[this->type].HP;
+    this->total_HP = plant_table[this->type].HP;
     this->damage = plant_table[this->type].damage;
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;
@@ -74,6 +78,7 @@ Pumpkin::Pumpkin() {
 Farmer::Farmer() {
     this->type = farmer;
     this->HP = plant_table[this->type].HP;
+    this->total_HP = plant_table[this->type].HP;
     this->damage = plant_table[this->type].damage;
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;
@@ -88,6 +93,7 @@ Farmer::Farmer() {
 Dryad::Dryad() {
     this->type = dryad;
     this->HP = plant_table[this->type].HP;
+    this->total_HP = plant_table[this->type].HP;
     this->damage = plant_table[this->type].damage;
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;
@@ -107,6 +113,7 @@ int Dryad::poison() {
 Cherry::Cherry() {
     this->type = cherry;
     this->HP = plant_table[this->type].HP;
+    this->total_HP = plant_table[this->type].HP;
     this->damage = plant_table[this->type].damage;
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;
@@ -125,6 +132,7 @@ void Cherry::suicide() {
 Cabbage::Cabbage() {
     this->type = cabbage;
     this->HP = plant_table[this->type].HP;
+    this->total_HP = plant_table[this->type].HP;
     this->damage = plant_table[this->type].damage;
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;
@@ -139,6 +147,7 @@ Cabbage::Cabbage() {
 Bamboo::Bamboo() {
     this->type = bamboo;
     this->HP = plant_table[this->type].HP;
+    this->total_HP = plant_table[this->type].HP;
     this->damage = plant_table[this->type].damage;
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;
@@ -153,6 +162,7 @@ Bamboo::Bamboo() {
 Pea::Pea() {
     this->type = pea;
     this->HP = plant_table[this->type].HP;
+    this->total_HP = plant_table[this->type].HP;
     this->damage = plant_table[this->type].damage;
     this->speed = plant_table[this->type].speed;
     this->range = plant_table[this->type].range;

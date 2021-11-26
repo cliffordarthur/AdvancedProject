@@ -1,20 +1,43 @@
-5 8
-5 5
+6 8
+1 8
 
-0 7 left  0 0 end
-1 7 left  1 0 end
-2 7 left  2 0 end
-3 7 left  3 0 end
+5 7 left  5 0 up  2 0 right  2 2 down  3 2 right  3 7 up  0 7 left  0 0 end
+
+5 6 up    0 6 end
+5 5 up    0 5 end
+5 4 up    0 4 end
+5 3 up    0 3 end
+5 2 up    0 2 end
+5 1 up    0 1 end
 4 7 left  4 0 end
-
-0 7 left  0 0 end
 1 7 left  1 0 end
-2 7 left  2 0 end
-3 7 left  3 0 end
-4 7 left  4 0 end
 
-pvz
+default
 
-none
+fort 0 7
 
 endfile
+
+
+地图行数 地图列数
+地面路径数 空中路径数
+
+地面路径1（按顺序记录路径的起点，拐点，终点的坐标和方向）
+...
+地面路径N
+
+空中路径1
+...
+空中路径N
+
+格子类型(default/pvz/melle/remote):
+    default: 地面路径上的格子是近战格子，其他为远程格子
+    pvz: 除去敌方出生点外的所有格子能种植任意类型的植物
+    melle: 在default基础上添加近战格子
+    remote: 在default基础上添加远程格子
+其中后两者需要指定格子坐标，完成后以endtype结尾，两者可以同时使用，例如
+    melle 0 0  melle 0 1  remote 1 2  endtype
+
+特殊格子(fort x y/none)
+    fort: 在(x, y)处有一fort，fort有较高血量，无攻击力；fort血量为0且有敌方地面单位进入fort所在格子后，敌方所有单位的攻击速度和移动速度提高
+    none: 无特殊格子

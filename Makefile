@@ -10,12 +10,12 @@ CXXFLAGS = $(shell wx-config --cxxflags)
 LIBS = $(shell wx-config --libs)
 
 $(prom): $(obj) $(build_dir)
-	$(cc) -o $(prom) $(obj) $(CXXFLAGS)
+	@$(cc) $(CXXFLAGS) -o $(prom) $(obj) $(LIBS)
 # $(cc) -o $(prom) $(obj) $(CURSES)
 
 .PHONY: run clean count
 run: $(obj)
-	$(cc) $(CXXFLAGS) -o $(prom) $(obj) $(LIBS) && $(prom)
+	@$(cc) $(CXXFLAGS) -o $(prom) $(obj) $(LIBS) && $(prom)
 # $(cc) -o $(prom) $(obj) $(CURSES) && $(prom)
 
 $(build_dir)/%.o: ./src/%.cpp $(deps)

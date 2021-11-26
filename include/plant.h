@@ -14,19 +14,18 @@ struct Planttable{
     int stop_num;
     int attack_target;
 }static plant_table[] = {
-    {"    dryad",     dryad, 100, 150, 12*FPS,   5,  2*FPS,  1, p_remote, ZOMBIE_NUM,   z_both},
-
     {"sunflower", sunflower,  80,  50,  3*FPS,   0,  3*FPS,  0,  p_other, ZOMBIE_NUM, z_ground},
     {"   cherry",    cherry, 999, 150, 12*FPS, 500,  1*FPS,  1,  p_other, ZOMBIE_NUM,   z_both},
     {"  pumpkin",   pumpkin, 500, 125, 12*FPS,   0,      1,  0,  p_other, ZOMBIE_NUM, z_ground},
 
     {"  wallnut",   wallnut, 500,  75, 10*FPS,   0,      1,  0,  p_melle, ZOMBIE_NUM, z_ground},
     {"spikeweed", spikeweed,  30, 100,  5*FPS,  10,  1*FPS,  0,  p_melle,          0, z_ground},
-    {"   bamboo",    bamboo, 150, 100,  8*FPS,  20,  1*FPS,  0,  p_melle, ZOMBIE_NUM, z_ground},//
-    {"  cabbage",   cabbage, 150, 100,  8*FPS,  10,  FPS/2,  0,  p_melle, ZOMBIE_NUM,   z_both},//
+    {"   bamboo",    bamboo, 150, 100,  8*FPS,  20,  1*FPS,  0,  p_melle, ZOMBIE_NUM, z_ground},
+    {"  cabbage",   cabbage, 150, 100,  8*FPS,  10,  FPS/2,  0,  p_melle, ZOMBIE_NUM,   z_both},
 
     {"   farmer",    farmer, 100, 450, 30*FPS,   0, 12*FPS,  1, p_remote, ZOMBIE_NUM, z_ground},
-    {"      pea",       pea, 100, 100,  6*FPS,  10,  1*FPS,  2, p_remote, ZOMBIE_NUM, z_ground},//
+    {"      pea",       pea, 100, 100,  6*FPS,  10,  1*FPS,  2, p_remote, ZOMBIE_NUM, z_ground},
+    {"    dryad",     dryad, 100, 150, 12*FPS,   5,  2*FPS,  1, p_remote, ZOMBIE_NUM,   z_both},
 
     {"   shovel",    shovel,   1,   0,      0,   0,      0,  0,  p_other,          0, z_ground},
 };
@@ -36,7 +35,7 @@ const int plant_num = sizeof(plant_table)/sizeof(plant_table[0]);
 class Plant{
 protected:
     int type;
-    int HP;
+    int HP, total_HP;
     int damage, speed, range;
     int counter;
     
@@ -55,11 +54,13 @@ public:
     int attack()const{return damage;}
     int show_type()const{return type;}
     int show_HP()const{return HP;}
+    int show_t_HP()const{return total_HP;}
     int show_counter()const{return counter;}
     int show_range()const{return range;}
     int show_s_n()const{return stop_num;}
     int show_a_t()const{return a_target;}
 
+    void set_total_HP(int H) {total_HP = H;}
     void be_attacked(int h){HP-=h; if (HP<0) HP=0;}
     void be_freezed(int f){if (!freeze) {speed*=2;} freeze = FPS*f;}
     int show_freeze()const {return freeze;}
@@ -146,4 +147,3 @@ public:
     void update();
     void no_CDtime(){for (int i = 0; i < plant_num; i++) menu[i].no_CDtime();}
 };
-//TODO:

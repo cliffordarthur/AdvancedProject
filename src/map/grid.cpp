@@ -39,7 +39,6 @@ bool Grid::can_plant(int c, int tmp) {
 void Grid::add_plant(int c) {
     if (c == pumpkin) {
         p_num++;
-        // has_pumpkin = true;
         Pumpkin *p = new Pumpkin;
         this->plant_p = p;
     }
@@ -88,7 +87,6 @@ void Grid::add_plant(int c) {
         Pea *p = new Pea;
         this->plant_0 = p;
     }
-    else return;//TODO: 
 }
 
 void Grid::use_shovel(int c) {
@@ -103,31 +101,7 @@ void Grid::use_shovel(int c) {
         delete this->plant_0;
         this->plant_0 = NULL;
     }
-    // return c;
 }
-
-// int Grid::use_shovel(){
-//     p_num--;
-//     if (has_pumpkin()) {
-//         // has_pumpkin = false;
-//         delete this->plant_p;
-//         this->plant_p = NULL;
-//         return pumpkin;
-//     }
-//     else {
-//         int tmp = this->plant_0->show_type();
-//         delete this->plant_0;
-//         this->plant_0 = NULL;
-//         return tmp;
-//     }
-// }
-
-// int Grid::use_shovel(int c) {
-//     p_num--;
-//     delete this->plant_0;
-//     this->plant_0 = NULL;
-//     return c;
-// }
 
 void Grid::add_zombie(Zombies *z){
     if (z_num < ZOMBIE_NUM) {
@@ -160,6 +134,7 @@ void Grid::add_fort() {
     // has_pumpkin = true;
     Pumpkin *p = new Pumpkin;
     p->be_attacked(-9*p->show_HP());
+    p->set_total_HP(p->show_HP());
     this->plant_p = p;
 }
 
@@ -172,4 +147,34 @@ void Grid::cheat_kill() {
             }
         }
     }
+}
+
+void Grid::paint(wxPaintDC &dc) {
+    double percent;
+    int init_x = MAP_BEGIN_X+y*GRID_SIZE, init_y = MAP_BEGIN_Y+x*GRID_SIZE;
+    if (has_pumpkin()) {
+        percent = plant_p->show_HP()/plant_p->show_t_HP();
+        dc.SetBrush(hp_color(percent));
+        dc.DrawCircle(wxPoint(init_x+pumpkin_x, init_y+pumpkin_y), p_other_r);
+    }
+
+    int tmp =  show_plant_type();
+    if (tmp >= 0){
+        percent = plant_0->show_HP()/plant_0->show_t_HP();
+        dc.SetBrush(hp_color(percent));
+        if (plant_table[tmp].p_type == p_other) {
+            dc.DrawCircle(wxPoint(init_x, init_y)+PlantShape[p_other][0], p_other_r);
+        }
+        else {
+            wxPoint points[] = {
+                wxPoint(init_x, init_y)+PlantShape[plant_table[tmp].p_type][0], 
+                wxPoint(init_x, init_y)+PlantShape[plant_table[tmp].p_type][1],
+                wxPoint(init_x, init_y)+PlantShape[plant_table[tmp].p_type][2],
+                wxPoint(init_x, init_y)+PlantShape[plant_table[tmp].p_type][3],
+            };
+            dc.DrawPolygon(4, points);
+        }
+    }
+
+    // paint enemy
 }

@@ -10,15 +10,7 @@ int get_digits(int num) {
     return d;
 }
 
-Map::~Map() {
-    // for (int i = 0; i < MAP_LINE; i++) {
-    //     for (int j = 0; j  <MAP_COL; j++) {
-    //         // std::cout<<grids[i*MAP_COL+j].show_type()<<" ";
-    //         std::cout<<paths[1][i*MAP_COL+j]<<" ";
-    //     }
-    //     std::cout<<"\n";
-    // }
-}
+Map::~Map() {}
 
 void Map::set_Map(){
     can_buy = true;
@@ -79,7 +71,7 @@ int Map::find_plants(int x, int y, Zombies *z) {
         int r = z->show_range();
         while (r>=0) {
             target = x*MAP_COL+y;
-            if (grids[target].p_num && (grids[target].has_pumpkin() || z->show_type() == gargantuar || grids[target].plant_0->show_s_n())) return target;//FIXME: garg... can attack spikeweed!
+            if (grids[target].p_num && (grids[target].has_pumpkin() || z->show_type() == gargantuar || grids[target].plant_0->show_s_n())) return target;
             int d = paths[z->show_path()][target];
             switch (d) {
                 case    diup: x--; break;
@@ -344,99 +336,4 @@ void Map::update(int& sun, bool& lose, int& score) {
             }
         }
     }
-}
-
-void Map::draw(int cursor_x, int cursor_y) {
-    printnc(MAP_COL*(GRID_LEN+1)/2-2, WHITE_BLACK, "=");
-    printc(YELLOW_BLACK, "MAP");
-    printnc(MAP_COL*(GRID_LEN+1)/2-1, WHITE_BLACK, "=");
-    printc(WHITE_BLACK, "\n\n");
-
-    for (int mapline = 0; mapline <= MAP_LINE; mapline++){
-        for (int i = 0, ii; i <= MAP_COL * (1 + GRID_LEN); i++) {
-            if ((mapline==cursor_x || mapline==cursor_x+1) && cursor_y*(1+GRID_LEN)<=i && i<=(1+cursor_y)*(1+GRID_LEN)) {
-                if (!can_buy) {printc(RED_BLACK, "+");}
-                else printc(YELLOW_BLACK, "+");
-            }
-            else if (i%(1+GRID_LEN)==0) {
-                int j = i/(1+GRID_LEN);
-                if (((mapline < MAP_LINE) && (j < MAP_COL) && (grids[mapline*MAP_COL+j].show_type() != remote)) || 
-                    ((mapline < MAP_LINE) && (j > 0) && (grids[mapline*MAP_COL+j-1].show_type() != remote))     ||
-                    ((mapline > 0) && (j < MAP_COL) && (grids[(mapline-1)*MAP_COL+j].show_type() != remote))    ||
-                    ((mapline > 0) && (j > 0) && (grids[(mapline-1)*MAP_COL+j-1].show_type() != remote))){
-                    printc(GREEN_BLACK, "+");}
-                else printc(WHITE_BLACK, "+");
-            }
-            else if ((mapline<MAP_LINE) && (grids[mapline*MAP_COL+i/(1+GRID_LEN)].show_type()!=remote) ||
-              (mapline>0) && (grids[(mapline-1)*MAP_COL+i/(1+GRID_LEN)].show_type()!=remote)) {
-                printc(GREEN_BLACK, "+");
-            }
-            else printc(WHITE_BLACK, "+");
-        }
-
-        printw("\n");
-        if (mapline == MAP_LINE) break;
-
-        for (int i = 0; i < GRID_HEI; i++) {
-            for (int j = 0; j <= MAP_COL*(1+GRID_LEN); j++) {
-                if (j%(1+GRID_LEN)==0) {
-                    if (mapline == cursor_x && (j==(1+GRID_LEN)*cursor_y||j==(1+GRID_LEN)*(1+cursor_y))) {
-                        if (!can_buy) {printc(RED_BLACK, "+");}
-                        else printc(YELLOW_BLACK, "+");
-                    }
-                    else if ((j > 0 && grids[mapline*MAP_COL+j/(1+GRID_LEN)-1].show_type()!=remote)||
-                             (j < MAP_COL*(1+GRID_LEN) && grids[mapline*MAP_COL+j/(1+GRID_LEN)].show_type()!=remote)) {
-                        printc(GREEN_BLACK, "+");
-                    }
-                    else printc(WHITE_BLACK, "+");
-                } // box
-                else if (j%(1+GRID_LEN)==1) {
-                    int tmp_y = j/(1+GRID_LEN);
-                    if (i==0 && grids[mapline*MAP_COL+tmp_y].plant_0) {
-                        int tmp_type = grids[mapline*MAP_COL+tmp_y].plant_0->show_type();
-                        int HP = grids[mapline*MAP_COL+tmp_y].plant_0->show_HP();
-                        switch (plant_table[tmp_type].p_type){
-                            case p_melle: printc(GREEN_BLACK, " %s ", plant_table[tmp_type].name);break;
-                            case p_remote: printc(CYAN_BLACK, " %s ", plant_table[tmp_type].name);break;
-                            default: printc(YELLOW_BLACK, " %s ", plant_table[tmp_type].name);break;
-                        }
-                        if (grids[mapline*MAP_COL+tmp_y].plant_0->show_freeze()) {printc(BLUE_BLACK, "%d", HP);}
-                        else printc(WHITE_BLACK, "%d", HP);
-                        j+=(strlen(plant_table[tmp_type].name)+get_digits(HP)+1);
-                    }
-                    else if (i==1 && grids[mapline*MAP_COL+tmp_y].plant_p) {
-                        int HP = grids[mapline*MAP_COL+tmp_y].plant_p->show_HP();
-                        printc(YELLOW_BLACK, " %s ", plant_table[pumpkin].name);
-                        printc(WHITE_BLACK, "%d", HP);
-                        j+=(strlen(plant_table[pumpkin].name)+get_digits(HP)+1);
-                    }
-                    else if (i>=2 && grids[mapline*MAP_COL+tmp_y].z_num > i-2) {
-                        int ii = i-2;
-                        for (int k = 0; k < ZOMBIE_NUM; k++) {
-                            if (grids[mapline*MAP_COL+tmp_y].zombies[k]){
-                                if (!ii) {
-                                    int tmp_type = grids[mapline*MAP_COL+tmp_y].zombies[k]->show_type();
-                                    int HP = grids[mapline*MAP_COL+tmp_y].zombies[k]->show_HP();
-                                    if (grids[mapline*MAP_COL+ tmp_y].zombies[k]->show_z_type()==z_air) {printc(CYAN_BLACK, " %s ", zombie_table[tmp_type].name);}
-                                    else printc(BLUE_BLACK, " %s ", zombie_table[tmp_type].name);
-                                    
-                                    if (grids[mapline*MAP_COL+ tmp_y].zombies[k]->show_crazy()) {printc(RED_BLACK, "%d", HP);}
-                                    else if (grids[mapline*MAP_COL+ tmp_y].zombies[k]->show_poison()) {printc(GREEN_BLACK, "%d", HP);}
-                                    else if (grids[mapline*MAP_COL+tmp_y].zombies[k]->show_encourage()) {printc(MAGENTA_BLACK, "%d", HP)}
-                                    else printc(WHITE_BLACK, "%d", HP);
-                                    j+=(strlen(zombie_table[tmp_type].name)+get_digits(HP)+1);
-                                    break;
-                                }
-                                ii--;
-                            }
-                        }
-                    }
-                    else printw(" ");
-                }
-                else printw(" ");
-            }
-            printw("\n");
-        }
-    }
-    can_buy = true;
 }

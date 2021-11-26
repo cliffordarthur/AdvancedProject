@@ -60,13 +60,13 @@ inline int max(int a, int b) {
     return (a>b)?a:b;
 }
 
-enum COLORS{WHITE_BLACK, RED_BLACK, GREEN_BLACK, YELLOW_BLACK, BLUE_BLACK, MAGENTA_BLACK, CYAN_BLACK};
+// enum COLORS{WHITE_BLACK, RED_BLACK, GREEN_BLACK, YELLOW_BLACK, BLUE_BLACK, MAGENTA_BLACK, CYAN_BLACK};
 
 #define ZOMBIE_NUM 256
 
 #define WIN_SEC 600
 
-enum Plantname{dryad, sunflower, cherry, pumpkin, wallnut, spikeweed, bamboo, cabbage, farmer, pea, shovel};
+enum Plantname{sunflower, cherry, pumpkin, wallnut, spikeweed, bamboo, cabbage, farmer, pea, dryad, shovel};
 
 enum Zombiename{zombie, conehead, imp, gargantuar, necromancer, catapult, balloon, bomber, frostwyrm};
 
@@ -81,7 +81,7 @@ enum Zombie_type{z_ground, z_air, z_both};
 enum Spec_type{fort, d_fort};
 
 // P3
-// #define SHOW_COORD
+#define SHOW_COORD
 
 #define DOCHEAT
 
