@@ -39,7 +39,6 @@ int Map::find_zombies(int x, int y, Plant *p) {
             if (x + i < 0 || x + i >= MAP_LINE) continue;
             for (int j = -rr; j <= rr; j++) {
                 if (y + j < 0 || y + j >= MAP_COL || (-rr+1<=i && i<=rr-1 && -rr+1<=j && j<=rr-1)) continue;
-                // if (grids[(x+i)*MAP_COL+y+j].z_num) return (x+i)*MAP_COL+y+j;   
                 int target = (x+i)*MAP_COL+y+j;
                 if ((p->show_a_t() == z_air && grids[target].a_z_num) || 
                     (p->show_a_t() == z_both && grids[target].z_num) ||
@@ -104,6 +103,26 @@ int Map::find_next_n(int n, int x, int y, int p) {
     return target;
 }
 
+void Map::farmer_plant_pumpkin(int grid_id) {
+    int tmp[] = {-MAP_COL, -1, 0, 1, MAP_COL};
+    for (int i = 0; i < 5; i++) {
+        int ref = tmp[grids[grid_id].plant_0->show_strategy(i)];
+        
+        bool flag;
+        if (ref == tmp[0]) {flag = (grid_id>=MAP_COL);}
+        else if (ref == tmp[1]) {flag = (grid_id%MAP_COL);}
+        else if (ref == tmp[3]) {flag = (grid_id%MAP_COL<(MAP_COL-1));}
+        else if (ref == tmp[4]) {flag = (grid_id/MAP_COL<(MAP_LINE-1));}
+        else {flag = true;}
+
+        if (flag && grids[grid_id+ref].show_type()!=g_z_base && !grids[grid_id+ref].plant_p) {
+            grids[grid_id+ref].add_plant(pumpkin);
+            return;
+        }
+    }
+    grids[grid_id].plant_0->counter_plus();
+}
+
 void Map::update(int& sun, bool& lose, int& score) {
     for (int i = 0; i < MAP_LINE; i++) { 
         for (int j = 0; j < MAP_COL; j++) {
@@ -111,13 +130,15 @@ void Map::update(int& sun, bool& lose, int& score) {
                 spec_type = d_fort;
             }
             if (grids[i*MAP_COL+j].plant_p) {
-                if (grids[i*MAP_COL+j].plant_p->show_HP() <= 0) {
+                if (grids[i*MAP_COL+j].plant_p->show_HP() <= 0) {   
+                    if (grids[i*MAP_COL+j].show_choose() == -2) {grids[i*MAP_COL+j].set_choose(-3);}
                     grids[i*MAP_COL+j].use_shovel(pumpkin);
                 }
             }
             if (grids[i*MAP_COL+j].plant_0) {
                 if (grids[i*MAP_COL+j].plant_0->show_freeze()) {grids[i*MAP_COL+j].plant_0->check_freeze();}
                 if (grids[i*MAP_COL+j].plant_0->show_HP() <= 0) {
+                    if (grids[i*MAP_COL+j].show_choose() == -1) {grids[i*MAP_COL+j].set_choose(-3);}
                     grids[i*MAP_COL+j].use_shovel(grids[i*MAP_COL+j].show_plant_type());
                 }
                 else{
@@ -146,22 +167,23 @@ void Map::update(int& sun, bool& lose, int& score) {
                         }
                         case farmer: {
                             if (grids[i*MAP_COL+j].plant_0->show_counter()==0) {
-                                if (!grids[i*MAP_COL+j].plant_p) {
-                                    grids[i*MAP_COL+j].add_plant(pumpkin);
-                                }
-                                else if (j < MAP_COL-1 && grids[i*MAP_COL+j+1].show_type()!=g_z_base && !grids[i*MAP_COL+j+1].plant_p) {
-                                    grids[i*MAP_COL+j+1].add_plant(pumpkin);
-                                }
-                                else if (i < MAP_LINE-1 && grids[(i+1)*MAP_COL+j].show_type()!=g_z_base && !grids[(i+1)*MAP_COL+j].plant_p) {
-                                    grids[(i+1)*MAP_COL+j].add_plant(pumpkin);
-                                }
-                                else if (j > 0 && grids[i*MAP_COL+j-1].show_type()!=g_z_base && !grids[i*MAP_COL+j-1].plant_p) {
-                                    grids[i*MAP_COL+j-1].add_plant(pumpkin);
-                                }
-                                else if (i > 0 && grids[(i-1)*MAP_COL+j].show_type()!=g_z_base && !grids[(i-1)*MAP_COL+j].plant_p) {
-                                    grids[(i-1)*MAP_COL+j].add_plant(pumpkin);
-                                }
-                                else grids[i*MAP_COL+j].plant_0->counter_plus();
+                                farmer_plant_pumpkin(i*MAP_COL+j);
+                                // if (!grids[i*MAP_COL+j].plant_p) {
+                                //     grids[i*MAP_COL+j].add_plant(pumpkin);
+                                // }
+                                // else if (j < MAP_COL-1 && grids[i*MAP_COL+j+1].show_type()!=g_z_base && !grids[i*MAP_COL+j+1].plant_p) {
+                                //     grids[i*MAP_COL+j+1].add_plant(pumpkin);
+                                // }
+                                // else if (i < MAP_LINE-1 && grids[(i+1)*MAP_COL+j].show_type()!=g_z_base && !grids[(i+1)*MAP_COL+j].plant_p) {
+                                //     grids[(i+1)*MAP_COL+j].add_plant(pumpkin);
+                                // }
+                                // else if (j > 0 && grids[i*MAP_COL+j-1].show_type()!=g_z_base && !grids[i*MAP_COL+j-1].plant_p) {
+                                //     grids[i*MAP_COL+j-1].add_plant(pumpkin);
+                                // }
+                                // else if (i > 0 && grids[(i-1)*MAP_COL+j].show_type()!=g_z_base && !grids[(i-1)*MAP_COL+j].plant_p) {
+                                //     grids[(i-1)*MAP_COL+j].add_plant(pumpkin);
+                                // }
+                                // else grids[i*MAP_COL+j].plant_0->counter_plus();
                             }
                             break;
                         }
@@ -226,6 +248,7 @@ void Map::update(int& sun, bool& lose, int& score) {
 
                     if (grids[i*MAP_COL+j].zombies[k]->show_HP() <= 0) {
                         score += zombie_table[grids[i*MAP_COL+j].zombies[k]->show_type()].score;
+                        if (grids[i*MAP_COL+j].show_choose() == k) {grids[i*MAP_COL+j].set_choose(-3);}
                         grids[i*MAP_COL+j].free_zombie(k);
                     }
                     else if (grids[i*MAP_COL+j].zombies[k]->show_type() == balloon &&

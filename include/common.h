@@ -1,19 +1,17 @@
 #pragma once
 #include <wx/wxprec.h>
-#ifndef WX_PRECOMP
-    #include <wx/wx.h>
-#endif
 
-#include <stdio.h>
-// #include <curses.h>
-#include <stdlib.h>
-#include <time.h>
-#include <assert.h>
-#include <string.h>
-#include <unistd.h>
+#include <wx/wx.h>
 
-#include <iostream>
-#include <vector>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <time.h>
+// #include <assert.h>
+// #include <string.h>
+// #include <unistd.h>
+
+// #include <iostream>
+// #include <vector>
 // using namespace std;
 
 // the map has 4 lines and 4 columns
@@ -23,44 +21,13 @@ extern int MAP_LINE;
 extern int MAP_COL;
 extern int g_path_num;
 extern int a_path_num;
-#define GRID_LEN 20
-#define GRID_HEI 5
-
-// require at least R_LINES lines and R_COLS columns
-// R_LINES > MAP_LINE * (5+1) + SHOP_LINE + INFO_LINE
-// R_COLS > MAP_COL * (20+1)
-#define R_LINES 52
-#define R_COLS 170
-
-// some keys in curses
-#define KEYENTER 10
-#define KEYESC 27
-#define KEYSPACE 32
-#define KEYUP (KEY_UP-0400)
-#define KEYDOWN (KEY_DOWN-0400)
-#define KEYLEFT (KEY_LEFT-0400)
-#define KEYRIGHT (KEY_RIGHT-0400)
 
 // FPS
 #define FPS 30
-// print with color
-// #define printc(color, format, ...)\
-//     do {attron(COLOR_PAIR(color));\
-//     printw(format, ## __VA_ARGS__);\
-//     attroff(COLOR_PAIR(color));} while(0);\
-
-// inline void printnc(int n, int color, const char* s) {
-//     while (n) {
-//         printc(color, s);
-//         n--;
-//     }
-// }
 
 inline int max(int a, int b) {
     return (a>b)?a:b;
 }
-
-// enum COLORS{WHITE_BLACK, RED_BLACK, GREEN_BLACK, YELLOW_BLACK, BLUE_BLACK, MAGENTA_BLACK, CYAN_BLACK};
 
 #define ZOMBIE_NUM 256
 
@@ -88,6 +55,10 @@ enum Spec_type{fort, d_fort};
 #define MAP_BEGIN_X 150
 #define MAP_BEGIN_Y 140
 #define GRID_SIZE 120
+#define INFO_BEGIN_X 1450
+#define INFO_BEGIN_Y 140
+// #define INFO_GAP_X 10
+#define INFO_GAP_Y (GRID_SIZE/12)
 
 #define RECOMMEMD_MAX_LINE 6
 #define RECOMMEMD_MAX_COLS 10
@@ -95,3 +66,21 @@ enum Spec_type{fort, d_fort};
 enum wxEVENT_ID {MAP_1 = wxID_HIGHEST + 1, MAP_2, 
     ID_Pause, ID_AS, ID_NC, ID_AE, ID_KA, SHOP_0};
 
+enum wxColourReverse {
+    BLACK = 0x000000, 
+    RED = 0x0000FF, 
+    GREEN4 = 0x008B00,
+    ORANGE = 0x00A5FF,
+    GREEN1 = 0x00FF00,
+    GREY31 = 0x4F4F4F,
+    GREY51 = 0x828282, 
+    DARKGREY = 0xA9A9A9, 
+    GREY = 0xBEBEBE,
+    LIGHTGREY = 0xD3D3D3, 
+    THISTLE2 = 0xEED2EE, 
+    PURPLE = 0xF020A0,
+    LIGHTSTEELBLUE1 = 0xFFE1CA,
+    CYAN = 0xFFFF00, 
+    LIGHTCYAN = 0xFFFFE0, 
+    WHITE = 0xFFFFFF,
+};

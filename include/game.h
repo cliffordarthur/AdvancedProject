@@ -12,6 +12,7 @@ public:
 class Board: public wxPanel {
     int sun, score;
     int cursor_x, cursor_y;
+    int cursor_choose;
     double time_counter;
     bool has_start, has_pause, lose;
     wxTimer *timer;
@@ -31,7 +32,7 @@ class Board: public wxPanel {
     void OnAddSun(wxCommandEvent &event) {sun += 10000;}
     void OnNoCD(wxCommandEvent &event) {
         shop.no_CDtime();
-        CHEAT[2]->SetBackgroundColour(wxColour(0xBE, 0xBE, 0xBE));
+        CHEAT[2]->SetBackgroundColour(wxColour(GREY));
     }
     void OnAddEnemy(wxCommandEvent &event) {cheat_gen_zombie(20);}
     void OnKillAll(wxCommandEvent &event) {map.cheat_kill();}
@@ -49,6 +50,7 @@ public:
     void cheat_gen_zombie(int num);
 
     void check();
+    void paint_info(wxPaintDC &dc, int colour, wxString wxstr, int ref_x, int ref_y_b, int ref_y_k=0);
 };
 
 class MyFrame: public wxFrame {
@@ -57,30 +59,3 @@ class MyFrame: public wxFrame {
 public:
     MyFrame(const wxString& title);
 };
-
-// class Game {
-//     int score;
-//     int sun;
-//     int cursor_x, cursor_y;
-//     Map map;
-//     Shop shop;
-//     WINDOW* win;
-//     bool lose, esc;
-//     clock_t begin, now;
-//     int time_counter;
-// public:
-//     Game();
-//     void init();
-//     void start();
-//     void gen_sun();
-//     void gen_zombie();
-//     void cheat_gen_zombie(int num);
-//     void show_result();
-//     void refresh_map();
-//     void wait();
-//     void input(char ch);
-//     void check();
-//     void show_info();
-//     void show_help();
-//     int read_map(int choice);
-// };

@@ -13,21 +13,45 @@ struct Planttable{
     int p_type;
     int stop_num;
     int attack_target;
+    wxString info;
+    wxString strategy;
 }static plant_table[] = {
-    {"sunflower", sunflower,  80,  50,  3*FPS,   0,  3*FPS,  0,  p_other, ZOMBIE_NUM, z_ground},
-    {"   cherry",    cherry, 999, 150, 12*FPS, 500,  1*FPS,  1,  p_other, ZOMBIE_NUM,   z_both},
-    {"  pumpkin",   pumpkin, 500, 125, 12*FPS,   0,      1,  0,  p_other, ZOMBIE_NUM, z_ground},
+    {"sunflower", sunflower,  80,  50,  3*FPS,   0,  3*FPS,  0,  p_other, ZOMBIE_NUM, z_ground, 
+        "Sunflowers are essential for you to \nproduce extra sun. Try planting as \nmany as you can!",
+        "---"},
+    {   "cherry",    cherry, 999, 150, 12*FPS, 500,  1*FPS,  1,  p_other, ZOMBIE_NUM,   z_both, 
+        "Cherry Bombs can blow up all zom-\nbies in an area. They have a short \nfuse so plant them near zombies.",
+        "---"},
+    {  "pumpkin",   pumpkin, 500, 125, 12*FPS,   0,      1,  0,  p_other, ZOMBIE_NUM, z_ground, 
+        "Pumpkins protect plants that are \nwithin their shells.",
+        "can be planted over another \nplant."},
 
-    {"  wallnut",   wallnut, 500,  75, 10*FPS,   0,      1,  0,  p_melle, ZOMBIE_NUM, z_ground},
-    {"spikeweed", spikeweed,  30, 100,  5*FPS,  10,  1*FPS,  0,  p_melle,          0, z_ground},
-    {"   bamboo",    bamboo, 150, 100,  8*FPS,  20,  1*FPS,  0,  p_melle, ZOMBIE_NUM, z_ground},
-    {"  cabbage",   cabbage, 150, 100,  8*FPS,  10,  FPS/2,  0,  p_melle, ZOMBIE_NUM,   z_both},
+    {  "wallnut",   wallnut, 500,  75, 10*FPS,   0,      1,  0,  p_melle, ZOMBIE_NUM, z_ground, 
+        "Wall-nuts have hard shells which you \ncan use to protect your other plants.",
+        "---"},
+    {"spikeweed", spikeweed,  30, 100,  5*FPS,  10,  1*FPS,  0,  p_melle,          0, z_ground, 
+        "Spikeweeds can hurt any zombies \nthat step on them.", 
+        "cannot be hurt by zombies \n(except for gargantuar)."},
+    {   "bamboo",    bamboo, 150, 100,  8*FPS,  20,  1*FPS,  0,  p_melle, ZOMBIE_NUM, z_ground,
+        "Bamboos can hurt a zombie in the\n grid.", 
+        "---"},
+    {  "cabbage",   cabbage, 150, 100,  8*FPS,  10,  FPS/2,  0,  p_melle, ZOMBIE_NUM,   z_both, 
+        "Cabbage-pults hurl cabbages at the \nenemy in the air.", 
+        "---"},
 
-    {"   farmer",    farmer, 100, 450, 30*FPS,   0, 12*FPS,  1, p_remote, ZOMBIE_NUM, z_ground},
-    {"      pea",       pea, 100, 100,  6*FPS,  10,  1*FPS,  2, p_remote, ZOMBIE_NUM, z_ground},
-    {"    dryad",     dryad, 100, 150, 12*FPS,   5,  2*FPS,  1, p_remote, ZOMBIE_NUM,   z_both},
+    {   "farmer",    farmer, 100, 450, 30*FPS,   0, 12*FPS,  1, p_remote, ZOMBIE_NUM, z_ground, 
+        "Farmers can plant pumpkins nearby.", 
+        "---"},
+    {      "pea",       pea, 100, 100,  6*FPS,  10,  1*FPS,  2, p_remote, ZOMBIE_NUM, z_ground, 
+        "Peashooters are your first line of \ndefense. THey shoot peas at attack-\ning zombies.", 
+        "---"},
+    {    "dryad",     dryad, 100, 150, 12*FPS,   5,  2*FPS,  1, p_remote, ZOMBIE_NUM,   z_both, 
+        "Dryads can attack any lane and \nshoot at air zombies too.", 
+        "poison the target."},
 
-    {"   shovel",    shovel,   1,   0,      0,   0,      0,  0,  p_other,          0, z_ground},
+    {   "shovel",    shovel,   1,   0,      0,   0,      0,  0,  p_other,          0, z_ground, 
+        "---", 
+        "---"},
 };
 
 const int plant_num = sizeof(plant_table)/sizeof(plant_table[0]);
@@ -48,6 +72,8 @@ public:
     virtual void suicide(){}
     virtual int poison(){return 0;}
     virtual int gen_sun()const{return 0;}
+    virtual int show_strategy(int i)const{return -1;}
+    virtual int show_tmp_strategy(int i)const{return -1;}
     int find_zombie;
     void cooldown();
     void counter_plus(){counter++;}
@@ -90,8 +116,12 @@ public:
 };
 
 class Farmer: public Plant{
+    int order[5];
+    int tmp_order[5];
 public:
     Farmer();
+    int show_strategy(int i)const{return order[i];}
+    int show_tmp_strategy(int i)const{return tmp_order[i];}
 };
 
 class Dryad: public Plant{
@@ -139,6 +169,8 @@ class Shop{
     int fail_to_cart;
 public: 
     Shop();
+    bool show_CD(int i) const {return menu[i].counter;}
+    int show_fail();
     void add_to_cart(int i, int sun);
     void clear_cart();
     int show_cart()const {return cart;}

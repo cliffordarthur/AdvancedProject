@@ -88,6 +88,18 @@ Farmer::Farmer() {
     this->counter = this->speed;
     this->stop_num = plant_table[this->type].stop_num;
     this->a_target = plant_table[this->type].attack_target;
+
+    memset(this->tmp_order, -1, sizeof(this->tmp_order));
+    this->order[0] = 2;
+    this->order[1] = 3;
+    this->order[2] = 4;
+    this->order[3] = 1;
+    this->order[4] = 0;
+    // this->tmp_order[0] = 2;
+    // this->tmp_order[1] = 3;
+    // this->tmp_order[2] = 4;
+    // this->tmp_order[3] = 1;
+    // this->tmp_order[4] = 0;
 }
 
 Dryad::Dryad() {

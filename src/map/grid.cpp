@@ -3,7 +3,7 @@
 Grid::Grid(){
     plant_0 = NULL;
     plant_p = NULL;
-    // has_pumpkin = false;
+    choose = -3; // pumpkin: -2; plant: -1; zombie: 0 to n
     p_num = 0;
     z_num = 0;
     a_z_num = 0;
@@ -24,7 +24,8 @@ void Grid::set_coordinate(int x0, int y0) {
 }
 
 bool Grid::can_plant(int c, int tmp) {
-    if (c < 0) return false;
+    if (type == g_z_base) return false;
+    else if (c < 0) return false;
     else if (c == shovel) { 
         if ((p_num == 0)||(tmp == 1 && p_num == 1)) return false;
     }
@@ -131,7 +132,6 @@ void Grid::free_zombie(int z) {
 
 void Grid::add_fort() {
     p_num++;
-    // has_pumpkin = true;
     Pumpkin *p = new Pumpkin;
     p->be_attacked(-9*p->show_HP());
     p->set_total_HP(p->show_HP());
@@ -153,14 +153,14 @@ void Grid::paint(wxPaintDC &dc) {
     double percent;
     int init_x = MAP_BEGIN_X+y*GRID_SIZE, init_y = MAP_BEGIN_Y+x*GRID_SIZE;
     if (has_pumpkin()) {
-        percent = plant_p->show_HP()/plant_p->show_t_HP();
+        percent = (double)(plant_p->show_HP())/plant_p->show_t_HP();
         dc.SetBrush(hp_color(percent));
         dc.DrawCircle(wxPoint(init_x+pumpkin_x, init_y+pumpkin_y), p_other_r);
     }
 
-    int tmp =  show_plant_type();
+    int tmp = show_plant_type();
     if (tmp >= 0){
-        percent = plant_0->show_HP()/plant_0->show_t_HP();
+        percent = (double)(plant_0->show_HP())/plant_0->show_t_HP();
         dc.SetBrush(hp_color(percent));
         if (plant_table[tmp].p_type == p_other) {
             dc.DrawCircle(wxPoint(init_x, init_y)+PlantShape[p_other][0], p_other_r);
@@ -177,4 +177,47 @@ void Grid::paint(wxPaintDC &dc) {
     }
 
     // paint enemy
+}
+
+Info Grid::show_info() const {
+    Info i;
+    switch (choose) {
+        case -3: {
+            break;
+        }
+        case -2: {
+            if (has_pumpkin()) {
+                i.name = wxString("pumpkin");
+                i.race = wxString("Plants");
+                i.HP = wxString::Format("%d/%d", plant_p->show_HP(), plant_p->show_t_HP());
+                i.recharge = wxString::Format("%d", plant_table[pumpkin].CDtime/FPS);
+                i.info = plant_table[pumpkin].info;
+                i.special = plant_table[pumpkin].strategy;
+            }
+            break;
+        }
+        case -1: {
+            if (show_plant_type()>=0) {
+                i.name = wxString(plant_table[plant_0->show_type()].name);
+                i.race = wxString("Plants");
+                i.HP = wxString::Format("%d/%d", plant_0->show_HP(), plant_0->show_t_HP());
+                i.F = wxString::Format("%.2f", (double)plant_0->show_freeze()/FPS);
+                i.recharge = wxString::Format("%d", plant_table[plant_0->show_type()].CDtime/FPS);
+                i.info = plant_table[plant_0->show_type()].info;
+                i.special = wxString("");
+                if (show_plant_type()==farmer) {
+                    for (int h = 0; h < 4; h++) {
+                        i.special += directions[show_order(h)]+"->";
+                    }
+                    i.special += directions[show_order(4)];
+                }
+                else i.special = plant_table[plant_0->show_type()].strategy;
+            }
+            break;
+        }
+        default: {
+            
+        }
+    }
+    return i;
 }

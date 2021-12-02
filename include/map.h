@@ -3,27 +3,38 @@
 #include "plant.h"
 #include "zombie.h"
 
+struct Info {
+    wxString name = "--",
+             race = "--",
+             HP = "--/--", 
+             F = "--", 
+             P = "--", 
+             C = "--", 
+             E = "--", 
+             recharge = "--",
+             info = "",
+             special = "";
+};
+
 class Grid{
     int type; /*melle or remote grids*/
     int x, y;
-    Plant *plant_0;
-    Plant *plant_p;
-    // bool has_pumpkin;
+    int choose;
     int p_num;
-
     int z_num;
     int a_z_num;
+    Plant *plant_0;
+    Plant *plant_p;
     Zombies *zombies[ZOMBIE_NUM];
 public:
     Grid();
     bool has_pumpkin()const {return plant_p;}
     int show_plant_type()const;
-    void set_type(int t){if (type!=g_z_base) type = t;} // is g_z_base necessary?
+    void set_type(int t){if (type!=g_z_base) type = t;}
     int show_type() const {return type;}
     void set_coordinate(int x0, int y0);
     bool can_plant(int c, int tmp);
     void add_plant(int c);
-    // int use_shovel();
     void use_shovel(int c);
 
     void add_zombie(Zombies* z);
@@ -34,6 +45,12 @@ public:
     void cheat_kill();
 
     void paint(wxPaintDC &dc);
+    void set_choose(int c) {choose = c;}
+    int show_choose() const {return choose;}
+    Info show_info() const;
+
+    int show_order(int i)const {if (plant_0) {return plant_0->show_strategy(i);} else {return -1;}}
+    int show_tmp_order(int i)const {if (plant_0) {return plant_0->show_tmp_strategy(i);} else {return -1;}}
     friend class Map;
 };
 
@@ -55,13 +72,16 @@ public:
     
     int find_zombies(int x, int y, Plant *p);
     int find_plants(int x, int y, Zombies *z);
-    // int find_plants(int r, int x, int y, int p, bool a_d);
     int find_next_n(int n, int x, int y, int p);
     
     void cheat_kill() {for (int i = 0; i < grids.size(); i++) grids[i].cheat_kill();}
+    void farmer_plant_pumpkin(int grid_id);
+
     friend class Game;
     friend class Board;
 };
+
+const wxString directions[5] = {"up", "left", "self", "right", "down"};
 
 const int pumpkin_x = GRID_SIZE/6;
 const int pumpkin_y = GRID_SIZE/6;
@@ -87,6 +107,8 @@ double area(int x1, int y1, int x2, int y2, int x3, int y3);
 
 double area(int x1, int y1, wxPoint wP2, wxPoint wP3);
 
-wxColour hp_color(double p, wxColour wC1 = wxColour(0x00, 0xFF, 0x00), wxColour wC2 = wxColour(0xFF, 0x00, 0x00));
+wxColour hp_color(double p, wxColour wC1 = wxColour(GREEN1), wxColour wC2 = wxColour(RED));
 
 bool inShape(int x, int y, bool is_plant, int type);
+
+void DrawStrategy(wxPaintDC &dc, int type, int x, int y, int size, int order[]);

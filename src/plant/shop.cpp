@@ -11,9 +11,13 @@ Shop::Shop(){
         menu[i].menu_set(i, plant_table[i].costs, plant_table[i].CDtime, plant_table[i].p_type);
     }
 }
+int Shop::show_fail() {
+    if (fail_to_cart >= 0) return fail_to_cart--;
+    else return -1;
+}
 
 void Shop::add_to_cart(int i, int sun) {
-    if (sun < menu[i].costs || menu[i].counter!=0) fail_to_cart = i;
+    if (sun < menu[i].costs || menu[i].counter!=0) fail_to_cart = FPS/10;
     else cart = i;
 }
 
