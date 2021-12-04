@@ -74,6 +74,8 @@ public:
     virtual int gen_sun()const{return 0;}
     virtual int show_strategy(int i)const{return -1;}
     virtual int show_tmp_strategy(int i)const{return -1;}
+    virtual void set_strategy(){}
+    virtual void set_tmp_strategy(int i, int j){}
     int find_zombie;
     void cooldown();
     void counter_plus(){counter++;}
@@ -122,6 +124,8 @@ public:
     Farmer();
     int show_strategy(int i)const{return order[i];}
     int show_tmp_strategy(int i)const{return tmp_order[i];}
+    void set_strategy(){for (int i = 0; i < 5; i++) order[i]=tmp_order[i];}
+    void set_tmp_strategy(int i, int j){tmp_order[i] = j;}
 };
 
 class Dryad: public Plant{

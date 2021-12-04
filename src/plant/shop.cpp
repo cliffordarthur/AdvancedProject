@@ -36,7 +36,7 @@ int Shop::ret_sun(int r) {
     return menu[r].costs/2;
 }
 
-void Shop::update() { //TODO: button colour (maybe unnecessary)
+void Shop::update() { 
     for (int i = 0; i < plant_num-1; i++){
         menu[i].cooldown();
     }

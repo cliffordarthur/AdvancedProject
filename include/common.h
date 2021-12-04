@@ -14,9 +14,6 @@
 // #include <vector>
 // using namespace std;
 
-// the map has 4 lines and 4 columns
-// the length of grid is 10 units 
-// displayed as 5*20(long name)
 extern int MAP_LINE;
 extern int MAP_COL;
 extern int g_path_num;
@@ -57,11 +54,16 @@ enum Spec_type{fort, d_fort};
 #define GRID_SIZE 120
 #define INFO_BEGIN_X 1450
 #define INFO_BEGIN_Y 140
-// #define INFO_GAP_X 10
 #define INFO_GAP_Y (GRID_SIZE/12)
+#define STRATEGY_X (INFO_GAP_Y*10)
+#define STRATEGY_Y (INFO_GAP_Y*8)
+#define STRATEGY_SIZE (INFO_GAP_Y*4)
 
 #define RECOMMEMD_MAX_LINE 6
 #define RECOMMEMD_MAX_COLS 10
+
+#define MAX_SHOW_A_NUM 4
+#define MAX_SHOW_G_NUM 6
 
 enum wxEVENT_ID {MAP_1 = wxID_HIGHEST + 1, MAP_2, 
     ID_Pause, ID_AS, ID_NC, ID_AE, ID_KA, SHOP_0};

@@ -178,7 +178,7 @@ void Board::OnPaint(wxPaintEvent &event) {
             
             if (map.grids[cursor_choose].show_choose()==-1 && map.grids[cursor_choose].show_plant_type()==farmer){
                 for (int h = 0; h < 5; h++) order[h] = map.grids[cursor_choose].show_tmp_order(h);
-                DrawStrategy(dc, 0, 10*INFO_GAP_Y, 8*INFO_GAP_Y, 4*INFO_GAP_Y, order);
+                DrawStrategy(dc, 0, STRATEGY_X, STRATEGY_Y, STRATEGY_SIZE, order);
             }
         }
     }
@@ -247,12 +247,49 @@ void Board::OnLeftDown(wxMouseEvent &event) {
                     }
                 }
             }
+            else if (relative_y <= a_lowest) {
+                int shape_n = inShape(relative_x, relative_y, false, z_air);
+                if (0 <= shape_n && shape_n < map.grids[grid_id].show_a_z_num()) {
+                    cursor_choose = grid_id;
+                    map.grids[cursor_choose].set_choose(map.grids[cursor_choose].return_zumbie_order(shape_n, false));
+                }
+            }
             else {
-                //TODO: enemys
+                int shape_n = inShape(relative_x, relative_y, false, z_ground);
+                if (0 <= shape_n && shape_n < map.grids[grid_id].show_g_z_num()) {
+                    cursor_choose = grid_id;
+                    map.grids[cursor_choose].set_choose(map.grids[cursor_choose].return_zumbie_order(shape_n));
+                }
             }
         }
     }
-    // else if () TODO: click info
+    else if (cursor_choose>=0 && map.grids[cursor_choose].show_choose()==-1 && map.grids[cursor_choose].show_plant_type()==farmer &&
+             INFO_BEGIN_X<=cursor_x && INFO_BEGIN_Y+4*GRID_SIZE<=cursor_y) {
+        if (INFO_BEGIN_X+STRATEGY_X+3*STRATEGY_SIZE <= cursor_x && cursor_x <= INFO_BEGIN_X+STRATEGY_X+9*STRATEGY_SIZE/2) {
+            if (INFO_BEGIN_Y+4*GRID_SIZE+STRATEGY_Y+STRATEGY_SIZE <= cursor_y && cursor_y <= INFO_BEGIN_Y+4*GRID_SIZE+STRATEGY_Y+2*STRATEGY_SIZE) {
+                map.grids[cursor_choose].set_order();
+            }
+            if (INFO_BEGIN_Y+4*GRID_SIZE+STRATEGY_Y+STRATEGY_SIZE <= cursor_y && cursor_y <= INFO_BEGIN_Y+4*GRID_SIZE+STRATEGY_Y+3*STRATEGY_SIZE) {
+                for (int i = 0; i < 5; i++) map.grids[cursor_choose].set_tmp_order(i, -1);
+            }
+        }
+        else {
+            if (cursor_x-INFO_BEGIN_X-STRATEGY_X+STRATEGY_SIZE<0 || cursor_y-INFO_BEGIN_Y-STRATEGY_Y-4*GRID_SIZE<0) return;
+            int stray = (cursor_x-INFO_BEGIN_X-STRATEGY_X+STRATEGY_SIZE)/STRATEGY_SIZE;
+            int strax = (cursor_y-INFO_BEGIN_Y-STRATEGY_Y-4*GRID_SIZE)/STRATEGY_SIZE;
+            if (0<=stray && stray<=2 && 0<=strax && strax<=2 && (stray==1||strax==1)) {
+                int grid_id = 2*strax+stray-1;
+                for (int i = 0; i < 5; i++) {
+                    if (map.grids[cursor_choose].show_tmp_order(i) == grid_id) break;
+                    if (map.grids[cursor_choose].show_tmp_order(i)<0) {
+                        map.grids[cursor_choose].set_tmp_order(i, grid_id);
+                        break;
+                    }
+                }  
+            }
+        }
+        Refresh();
+    }
 }
 
 void Board::OnRightDown(wxMouseEvent &event) {

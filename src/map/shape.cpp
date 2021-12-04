@@ -30,7 +30,7 @@ wxColour hp_color(double p, wxColour wC1, wxColour wC2) {
     return wxColour(r3, g3, b3);
 }
 
-bool inShape(int x, int y, bool is_plant, int type) {
+int inShape(int x, int y, bool is_plant, int type) {
     if (is_plant) {
         switch (type) {
             case -1: {
@@ -47,13 +47,29 @@ bool inShape(int x, int y, bool is_plant, int type) {
             case 2: {
                 return (distance(x, y, PlantShape[2][0].x, PlantShape[2][0].y) <= p_other_r);
             }
-            default: return false;
+            default: return 0;
         }
     }
     else {
-        // TODO: enemy
+        if (type == z_ground) {
+            for (int i = 0; i < MAX_SHOW_G_NUM; i++) {
+                if (ZombieShape[0][0].y <= y && y <= ZombieShape[0][0].y+ZombieShape[0][1].y && 
+                    ZombieShape[0][0].x+i*ZombieShape[0][2].x <= x && x <= ZombieShape[0][0].x+i*ZombieShape[0][2].x+ZombieShape[0][1].x) {
+                    return i;
+                }
+            }
+        }
+        else {
+            double s0 = area(ZombieShape[1][1].x, ZombieShape[1][1].y, ZombieShape[1][0], ZombieShape[1][2]);
+            for (int i = 0; i < MAX_SHOW_A_NUM; i++) {
+                double s = area(x, y, ZombieShape[1][0]+i*ZombieShape[1][3], ZombieShape[1][2]+i*ZombieShape[1][3]) +
+                           area(x, y, ZombieShape[1][0]+i*ZombieShape[1][3], ZombieShape[1][1]+i*ZombieShape[1][3]) +
+                           area(x, y, ZombieShape[1][1]+i*ZombieShape[1][3], ZombieShape[1][2]+i*ZombieShape[1][3]);
+                if (abs(s-s0) <= 1) return i;
+            }   
+        }
+        return -1;
     }
-    return false;
 }
 
 void DrawStrategy(wxPaintDC &dc, int type, int x, int y, int size, int order[]) {

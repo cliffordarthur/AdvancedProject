@@ -9,6 +9,8 @@ Grid::Grid(){
     a_z_num = 0;
     type = remote;
     for (int i = 0; i < ZOMBIE_NUM; i++) zombies[i] = NULL;
+    show_a_z.resize(MAX_SHOW_A_NUM, -1);
+    show_g_z.resize(MAX_SHOW_G_NUM, -1);
 }
 
 int Grid::show_plant_type() const{
@@ -176,7 +178,31 @@ void Grid::paint(wxPaintDC &dc) {
         }
     }
 
-    // paint enemy
+    if (z_num) {
+        for (int i = 0, g = 0, a = 0; i < ZOMBIE_NUM; i++) {
+            if (zombies[i]) {
+                if (zombies[i]->show_z_type() == z_ground && g < MAX_SHOW_G_NUM) {
+                    percent = (double)(zombies[i]->show_HP())/zombies[i]->show_t_HP();
+                    dc.SetBrush(hp_color(percent));
+                    dc.DrawRectangle(wxPoint(init_x, init_y)+ZombieShape[0][0]+g*ZombieShape[0][2], wxSize(ZombieShape[0][1].x, ZombieShape[0][1].y));
+                    show_g_z[g] = i;
+                    g++;
+                }
+                else if (zombies[i]->show_z_type() == z_air && a < MAX_SHOW_A_NUM) {
+                    percent = (double)(zombies[i]->show_HP())/zombies[i]->show_t_HP();
+                    dc.SetBrush(hp_color(percent));
+                    wxPoint points[] = {
+                        wxPoint(init_x, init_y)+ZombieShape[1][0]+a*ZombieShape[1][3], 
+                        wxPoint(init_x, init_y)+ZombieShape[1][1]+a*ZombieShape[1][3], 
+                        wxPoint(init_x, init_y)+ZombieShape[1][2]+a*ZombieShape[1][3], 
+                    };
+                    dc.DrawPolygon(3, points);
+                    show_a_z[a] = i;
+                    a++;
+                }
+            }
+        }
+    }
 }
 
 Info Grid::show_info() const {

@@ -168,22 +168,6 @@ void Map::update(int& sun, bool& lose, int& score) {
                         case farmer: {
                             if (grids[i*MAP_COL+j].plant_0->show_counter()==0) {
                                 farmer_plant_pumpkin(i*MAP_COL+j);
-                                // if (!grids[i*MAP_COL+j].plant_p) {
-                                //     grids[i*MAP_COL+j].add_plant(pumpkin);
-                                // }
-                                // else if (j < MAP_COL-1 && grids[i*MAP_COL+j+1].show_type()!=g_z_base && !grids[i*MAP_COL+j+1].plant_p) {
-                                //     grids[i*MAP_COL+j+1].add_plant(pumpkin);
-                                // }
-                                // else if (i < MAP_LINE-1 && grids[(i+1)*MAP_COL+j].show_type()!=g_z_base && !grids[(i+1)*MAP_COL+j].plant_p) {
-                                //     grids[(i+1)*MAP_COL+j].add_plant(pumpkin);
-                                // }
-                                // else if (j > 0 && grids[i*MAP_COL+j-1].show_type()!=g_z_base && !grids[i*MAP_COL+j-1].plant_p) {
-                                //     grids[i*MAP_COL+j-1].add_plant(pumpkin);
-                                // }
-                                // else if (i > 0 && grids[(i-1)*MAP_COL+j].show_type()!=g_z_base && !grids[(i-1)*MAP_COL+j].plant_p) {
-                                //     grids[(i-1)*MAP_COL+j].add_plant(pumpkin);
-                                // }
-                                // else grids[i*MAP_COL+j].plant_0->counter_plus();
                             }
                             break;
                         }

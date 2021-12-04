@@ -26,6 +26,7 @@ class Grid{
     Plant *plant_0;
     Plant *plant_p;
     Zombies *zombies[ZOMBIE_NUM];
+    std::vector<int> show_a_z, show_g_z;
 public:
     Grid();
     bool has_pumpkin()const {return plant_p;}
@@ -51,6 +52,11 @@ public:
 
     int show_order(int i)const {if (plant_0) {return plant_0->show_strategy(i);} else {return -1;}}
     int show_tmp_order(int i)const {if (plant_0) {return plant_0->show_tmp_strategy(i);} else {return -1;}}
+    void set_order(){plant_0->set_strategy();}
+    void set_tmp_order(int i, int j){plant_0->set_tmp_strategy(i, j);}
+    int show_g_z_num()const{return z_num-a_z_num;}
+    int show_a_z_num()const{return a_z_num;}
+    int return_zumbie_order(int i, bool g = true)const {if (g) {return show_g_z[i];}else {return show_a_z[i];}}
     friend class Map;
 };
 
@@ -97,6 +103,13 @@ const std::vector<std::vector<wxPoint> > PlantShape = {
 };
 
 const int p_lowest = GRID_SIZE*7/24;
+const int a_lowest = GRID_SIZE*7/10;
+
+const std::vector<std::vector<wxPoint> > ZombieShape = {
+    {wxPoint(GRID_SIZE/20, GRID_SIZE*4/5), wxPoint(GRID_SIZE*13/120, GRID_SIZE*3/20), wxPoint(GRID_SIZE*19/120, 0)},
+    {wxPoint(GRID_SIZE/15, GRID_SIZE*2/3), wxPoint(GRID_SIZE*7/30, GRID_SIZE*2/3), 
+     wxPoint(GRID_SIZE*3/20, GRID_SIZE*21/40), wxPoint(GRID_SIZE*7/30, 0)},
+};
 
 const double area_0 = abs((PlantShape[0][1].x+PlantShape[0][2].x-PlantShape[0][0].x-PlantShape[0][3].x)*
                           (PlantShape[0][1].y-PlantShape[0][2].y)/2.0);
@@ -109,6 +122,6 @@ double area(int x1, int y1, wxPoint wP2, wxPoint wP3);
 
 wxColour hp_color(double p, wxColour wC1 = wxColour(GREEN1), wxColour wC2 = wxColour(RED));
 
-bool inShape(int x, int y, bool is_plant, int type);
+int inShape(int x, int y, bool is_plant, int type);
 
 void DrawStrategy(wxPaintDC &dc, int type, int x, int y, int size, int order[]);
