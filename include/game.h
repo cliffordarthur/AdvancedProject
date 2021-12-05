@@ -12,7 +12,6 @@ public:
 class Board: public wxPanel {
     int sun, score;
     int cursor_x, cursor_y;
-    int cursor_choose;
     double time_counter;
     bool has_start, has_pause, lose;
     wxTimer *timer;

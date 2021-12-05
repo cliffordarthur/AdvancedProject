@@ -16,6 +16,7 @@ void Map::set_Map(){
     can_buy = true;
     spec_type = -1;
     spec_coord = -1;
+    cursor_choose = -1;
     grids.resize(MAP_LINE*MAP_COL);
     paths.resize(g_path_num+a_path_num);
     for (int i = 0; i < g_path_num+a_path_num; i++) {
@@ -126,28 +127,29 @@ void Map::farmer_plant_pumpkin(int grid_id) {
 void Map::update(int& sun, bool& lose, int& score) {
     for (int i = 0; i < MAP_LINE; i++) { 
         for (int j = 0; j < MAP_COL; j++) {
-            if (spec_type==fort && spec_coord==i*MAP_COL+j && grids[i*MAP_COL+j].plant_p->show_HP() <= 0) {
+            int grid_id = i*MAP_COL+j;
+            if (spec_type==fort && spec_coord==grid_id && grids[grid_id].plant_p->show_HP() <= 0) {
                 spec_type = d_fort;
             }
-            if (grids[i*MAP_COL+j].plant_p) {
-                if (grids[i*MAP_COL+j].plant_p->show_HP() <= 0) {   
-                    if (grids[i*MAP_COL+j].show_choose() == -2) {grids[i*MAP_COL+j].set_choose(-3);}
-                    grids[i*MAP_COL+j].use_shovel(pumpkin);
+            if (grids[grid_id].plant_p) {
+                if (grids[grid_id].plant_p->show_HP() <= 0) {   
+                    if (grids[grid_id].show_choose() == -2) {grids[grid_id].set_choose(-3);}
+                    grids[grid_id].use_shovel(pumpkin);
                 }
             }
-            if (grids[i*MAP_COL+j].plant_0) {
-                if (grids[i*MAP_COL+j].plant_0->show_freeze()) {grids[i*MAP_COL+j].plant_0->check_freeze();}
-                if (grids[i*MAP_COL+j].plant_0->show_HP() <= 0) {
-                    if (grids[i*MAP_COL+j].show_choose() == -1) {grids[i*MAP_COL+j].set_choose(-3);}
-                    grids[i*MAP_COL+j].use_shovel(grids[i*MAP_COL+j].show_plant_type());
+            if (grids[grid_id].plant_0) {
+                if (grids[grid_id].plant_0->show_freeze()) {grids[grid_id].plant_0->check_freeze();}
+                if (grids[grid_id].plant_0->show_HP() <= 0) {
+                    if (grids[grid_id].show_choose() == -1) {grids[grid_id].set_choose(-3);}
+                    grids[grid_id].use_shovel(grids[grid_id].show_plant_type());
                 }
                 else{
-                    grids[i*MAP_COL+j].plant_0->find_zombie = find_zombies(i, j, grids[i*MAP_COL+j].plant_0);
-                    grids[i*MAP_COL+j].plant_0->cooldown();
-                    switch (grids[i*MAP_COL+j].plant_0->show_type()) {
+                    grids[grid_id].plant_0->find_zombie = find_zombies(i, j, grids[grid_id].plant_0);
+                    grids[grid_id].plant_0->cooldown();
+                    switch (grids[grid_id].plant_0->show_type()) {
                         case sunflower: {
-                            if (grids[i*MAP_COL+j].plant_0->show_counter()==0) {
-                                sun += grids[i*MAP_COL+j].plant_0->gen_sun();
+                            if (grids[grid_id].plant_0->show_counter()==0) {
+                                sun += grids[grid_id].plant_0->gen_sun();
                             } 
                             break;
                         }
@@ -155,29 +157,29 @@ void Map::update(int& sun, bool& lose, int& score) {
                             break;
                         }
                         case spikeweed: {
-                            if (grids[i*MAP_COL+j].plant_0->find_zombie >= 0 && grids[i*MAP_COL+j].plant_0->show_counter()==0) {
-                                for (int k = 0, zz = 0; k < ZOMBIE_NUM && zz < grids[i*MAP_COL+j].z_num-grids[i*MAP_COL+j].a_z_num; k++) {
-                                    if (grids[i*MAP_COL+j].zombies[k] && grids[i*MAP_COL+j].zombies[k]->show_z_type()!=z_air) {
+                            if (grids[grid_id].plant_0->find_zombie >= 0 && grids[grid_id].plant_0->show_counter()==0) {
+                                for (int k = 0, zz = 0; k < ZOMBIE_NUM && zz < grids[grid_id].z_num-grids[grid_id].a_z_num; k++) {
+                                    if (grids[grid_id].zombies[k] && grids[grid_id].zombies[k]->show_z_type()!=z_air) {
                                         zz++;
-                                        grids[i*MAP_COL+j].zombies[k]->be_attacked(grids[i*MAP_COL+j].plant_0->attack());
+                                        grids[grid_id].zombies[k]->be_attacked(grids[grid_id].plant_0->attack());
                                     }
                                 }
                             }
                             break;
                         }
                         case farmer: {
-                            if (grids[i*MAP_COL+j].plant_0->show_counter()==0) {
-                                farmer_plant_pumpkin(i*MAP_COL+j);
+                            if (grids[grid_id].plant_0->show_counter()==0) {
+                                farmer_plant_pumpkin(grid_id);
                             }
                             break;
                         }
                         case dryad: {
-                            if (grids[i*MAP_COL+j].plant_0->find_zombie >= 0 && grids[i*MAP_COL+j].plant_0->show_counter()==0) {
-                                int target = grids[i*MAP_COL+j].plant_0->find_zombie;
+                            if (grids[grid_id].plant_0->find_zombie >= 0 && grids[grid_id].plant_0->show_counter()==0) {
+                                int target = grids[grid_id].plant_0->find_zombie;
                                 for (int k = 0; k < ZOMBIE_NUM; k++) {
                                     if (grids[target].zombies[k]) {
-                                        grids[target].zombies[k]->be_attacked(grids[i*MAP_COL+j].plant_0->attack());
-                                        grids[target].zombies[k]->be_poisoned(grids[i*MAP_COL+j].plant_0->poison());
+                                        grids[target].zombies[k]->be_attacked(grids[grid_id].plant_0->attack());
+                                        grids[target].zombies[k]->be_poisoned(grids[grid_id].plant_0->poison());
                                         break;
                                     }
                                 }
@@ -187,11 +189,11 @@ void Map::update(int& sun, bool& lose, int& score) {
                         case bamboo:
                         case cabbage:
                         case pea: {
-                            if (grids[i*MAP_COL+j].plant_0->find_zombie >= 0 && grids[i*MAP_COL+j].plant_0->show_counter()==0) {
-                                int target = grids[i*MAP_COL+j].plant_0->find_zombie;
+                            if (grids[grid_id].plant_0->find_zombie >= 0 && grids[grid_id].plant_0->show_counter()==0) {
+                                int target = grids[grid_id].plant_0->find_zombie;
                                 for (int k = 0; k < ZOMBIE_NUM; k++) {
                                     if (grids[target].zombies[k]) {
-                                        grids[target].zombies[k]->be_attacked(grids[i*MAP_COL+j].plant_0->attack());
+                                        grids[target].zombies[k]->be_attacked(grids[grid_id].plant_0->attack());
                                         break;
                                     }
                                 }
@@ -199,8 +201,8 @@ void Map::update(int& sun, bool& lose, int& score) {
                             break;
                         }
                         case cherry: {
-                            if (grids[i*MAP_COL+j].plant_0->show_counter()==0) {
-                                int range = grids[i*MAP_COL+j].plant_0->show_range();
+                            if (grids[grid_id].plant_0->show_counter()==0) {
+                                int range = grids[grid_id].plant_0->show_range();
                                 for (int _i = -range; _i <= range; _i++) {
                                     if (i+_i < 0 || i+_i >= MAP_LINE) continue;
                                     for (int _j = -range; _j <= range; _j++) {
@@ -208,12 +210,12 @@ void Map::update(int& sun, bool& lose, int& score) {
                                         for (int k = 0, zz = 0; k < ZOMBIE_NUM && zz < grids[(i+_i)*MAP_COL+j+_j].z_num; k++) {
                                             if (grids[(i+_i)*MAP_COL+j+_j].zombies[k]) {
                                                 zz++;
-                                                grids[(i+_i)*MAP_COL+j+_j].zombies[k]->be_attacked(grids[i*MAP_COL+j].plant_0->attack());
+                                                grids[(i+_i)*MAP_COL+j+_j].zombies[k]->be_attacked(grids[grid_id].plant_0->attack());
                                             }
                                         }
                                     }
                                 }
-                                grids[i*MAP_COL+j].plant_0->suicide();
+                                grids[grid_id].plant_0->suicide();
                             }
                             break;
                         }
@@ -222,70 +224,75 @@ void Map::update(int& sun, bool& lose, int& score) {
                 }
             }
             
-            if (grids[i*MAP_COL+j].z_num) {
-                int tmp_z_num = grids[i*MAP_COL+j].z_num;
+            if (grids[grid_id].z_num) {
+                int tmp_z_num = grids[grid_id].z_num;
                 for (int k = 0, zz = 0; k < ZOMBIE_NUM && zz < tmp_z_num; k++) {
-                    if (!grids[i*MAP_COL+j].zombies[k]) continue;
+                    if (!grids[grid_id].zombies[k]) continue;
                     zz++;
-                    grids[i*MAP_COL+j].zombies[k]->check_encourage(zombie_table[necromancer].damage);
-                    if (grids[i*MAP_COL+j].zombies[k]->show_poison()) {grids[i*MAP_COL+j].zombies[k]->suffer_poison();}
+                    grids[grid_id].zombies[k]->check_encourage(zombie_table[necromancer].damage);
+                    if (grids[grid_id].zombies[k]->show_poison()) {grids[grid_id].zombies[k]->suffer_poison();}
 
-                    if (grids[i*MAP_COL+j].zombies[k]->show_HP() <= 0) {
-                        score += zombie_table[grids[i*MAP_COL+j].zombies[k]->show_type()].score;
-                        if (grids[i*MAP_COL+j].show_choose() == k) {grids[i*MAP_COL+j].set_choose(-3);}
-                        grids[i*MAP_COL+j].free_zombie(k);
+                    if (grids[grid_id].zombies[k]->show_HP() <= 0) {
+                        if (cursor_choose == grid_id && grids[grid_id].show_choose() == k) {
+                            grids[grid_id].set_choose(-3);
+                        }
+                        score += zombie_table[grids[grid_id].zombies[k]->show_type()].score;
+                        grids[grid_id].free_zombie(k);
                     }
-                    else if (grids[i*MAP_COL+j].zombies[k]->show_type() == balloon &&
-                            (grids[i*MAP_COL+j].zombies[k]->show_t_HP() > grids[i*MAP_COL+j].zombies[k]->show_HP() ||
-                             grids[i*MAP_COL+j].zombies[k]->show_r_g() == 0)){
-                        Zombies *o = grids[i*MAP_COL+j].zombies[k];
+                    else if (grids[grid_id].zombies[k]->show_type() == balloon &&
+                            (grids[grid_id].zombies[k]->show_t_HP() > grids[grid_id].zombies[k]->show_HP() ||
+                             grids[grid_id].zombies[k]->show_r_g() == 0)){
+                        Zombies *o = grids[grid_id].zombies[k];
                         Zombie *z = new Zombie(o->show_HP(), o->show_scounter(), o->show_path(), o->show_poison());
-                        z->set_direction(paths[z->show_path()][i*MAP_COL+j], o->show_r_g());
-                        grids[i*MAP_COL+j].add_zombie(z);
-                        grids[i*MAP_COL+j].free_zombie(k);
+                        z->set_direction(paths[z->show_path()][grid_id], o->show_r_g());
+                        int tmp_c = grids[grid_id].add_zombie(z);
+                        if (cursor_choose == grid_id && grids[grid_id].show_choose() == k) {
+                            grids[grid_id].set_choose(tmp_c);
+                        }
+                        grids[grid_id].free_zombie(k);
                     }
-                    else if (grids[i*MAP_COL+j].zombies[k]->show_type() == gargantuar &&
-                        grids[i*MAP_COL+j].zombies[k]->has_throw==-1 &&
-                        ((grids[i*MAP_COL+j].zombies[k]->show_HP() <= grids[i*MAP_COL+j].zombies[k]->show_t_HP()/2) || 
-                        (grids[i*MAP_COL+j].zombies[k]->show_r_g() <= length[grids[i*MAP_COL+j].zombies[k]->show_path()]/2))) {
-                        grids[i*MAP_COL+j].zombies[k]->has_throw = FPS;
+                    else if (grids[grid_id].zombies[k]->show_type() == gargantuar &&
+                        grids[grid_id].zombies[k]->has_throw==-1 &&
+                        ((grids[grid_id].zombies[k]->show_HP() <= grids[grid_id].zombies[k]->show_t_HP()/2) || 
+                        (grids[grid_id].zombies[k]->show_r_g() <= length[grids[grid_id].zombies[k]->show_path()]/2))) {
+                        grids[grid_id].zombies[k]->has_throw = FPS;
                     }
-                    else if (grids[i*MAP_COL+j].zombies[k]->has_throw>0) {grids[i*MAP_COL+j].zombies[k]->has_throw--;}
+                    else if (grids[grid_id].zombies[k]->has_throw>0) {grids[grid_id].zombies[k]->has_throw--;}
                     else {
-                        if (spec_type==d_fort) {grids[i*MAP_COL+j].zombies[k]->get_crazy();}
-                        int target = find_plants(i, j, grids[i*MAP_COL+j].zombies[k]);
-                        grids[i*MAP_COL+j].zombies[k]->cooldown();
+                        if (spec_type==d_fort) {grids[grid_id].zombies[k]->get_crazy();}
+                        int target = find_plants(i, j, grids[grid_id].zombies[k]);
+                        grids[grid_id].zombies[k]->cooldown();
                         
                         /* The zombie can move or attack */
-                        if (grids[i*MAP_COL+j].zombies[k]->show_counter()==0) {
-                            if (grids[i*MAP_COL+j].zombies[k]->has_throw==0) {
-                                Imp *z = new Imp(grids[i*MAP_COL+j].zombies[k]->show_path());
+                        if (grids[grid_id].zombies[k]->show_counter()==0) {
+                            if (grids[grid_id].zombies[k]->has_throw==0) {
+                                Imp *z = new Imp(grids[grid_id].zombies[k]->show_path());
                                 int ttarget = find_next_n(length[z->show_path()]/4, i, j, z->show_path());
                                 z->set_direction(paths[z->show_path()][ttarget]);
                                 grids[ttarget].add_zombie(z);
-                                grids[i*MAP_COL+j].zombies[k]->has_throw = -2;
+                                grids[grid_id].zombies[k]->has_throw = -2;
                                 continue;
                             }
                             /* The zombie finds plants */
-                            if (target != -1 || grids[i*MAP_COL+j].zombies[k]->show_type()==necromancer) {
-                                switch (grids[i*MAP_COL+j].zombies[k]->show_type()) {
+                            if (target != -1 || grids[grid_id].zombies[k]->show_type()==necromancer) {
+                                switch (grids[grid_id].zombies[k]->show_type()) {
                                     case frostwyrm: {
-                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());}
-                                        else if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());}
+                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[grid_id].zombies[k]->attack());}
+                                        else if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[grid_id].zombies[k]->attack());}
 
-                                        int r = grids[i*MAP_COL+j].zombies[k]->show_freeze_r();assert(r==1);
+                                        int r = grids[grid_id].zombies[k]->show_freeze_r();
                                         for (int _i = -r; _i <= r; _i++) {
                                             if (i + _i < 0 || i + _i >= MAP_LINE) continue;
                                             for (int _j = -r; _j <= r; _j++) {
                                                 if (j + _j < 0 || j + _j >= MAP_COL) continue;
                                                 int f_target = (i+_i)*MAP_COL+j+_j;
-                                                if (grids[f_target].plant_0) grids[f_target].plant_0->be_freezed(grids[i*MAP_COL+j].zombies[k]->freeze());
+                                                if (grids[f_target].plant_0) grids[f_target].plant_0->be_freezed(grids[grid_id].zombies[k]->freeze());
                                             }
                                         }
                                         break;
                                     }
                                     case necromancer: {
-                                        int r = grids[i*MAP_COL+j].zombies[k]->show_encourage_r();
+                                        int r = grids[grid_id].zombies[k]->show_encourage_r();
                                         for (int _i = -r; _i <= r; _i++) {
                                             if (i + _i < 0 || i + _i >= MAP_LINE) continue;
                                             for (int _j = -r; _j <= r; _j++) {
@@ -305,35 +312,44 @@ void Map::update(int& sun, bool& lose, int& score) {
                                         break;
                                     }
                                     case gargantuar: {
-                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());}
-                                        if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());}
+                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[grid_id].zombies[k]->attack());}
+                                        if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[grid_id].zombies[k]->attack());}
                                         break;
                                     }
                                     default: {
-                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());}
-                                        else if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[i*MAP_COL+j].zombies[k]->attack());}
+                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[grid_id].zombies[k]->attack());}
+                                        else if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[grid_id].zombies[k]->attack());}
                                         break;
                                     }
                                 }
                             }
                             /* The zombie is not warlike or cannot find plants, so he moved */
-                            if (!grids[i*MAP_COL+j].zombies[k]->show_warlike() || target == -1) {
-                                int ready = grids[i*MAP_COL+j].zombies[k]->walk();
+                            if (!grids[grid_id].zombies[k]->show_warlike() || target == -1) {
+                                int ready = grids[grid_id].zombies[k]->walk();
                                 if (ready) {
-                                    int next = grids[i*MAP_COL+j].zombies[k]->cross_grid(i, j);
+                                    int next = grids[grid_id].zombies[k]->cross_grid(i, j);
                                     if (next<0) {
-                                        if (grids[i*MAP_COL+j].zombies[k]->show_z_type() == z_ground) {
+                                        if (cursor_choose == grid_id && k == grids[grid_id].show_choose()) {
+                                            cursor_choose = -1;
+                                            grids[grid_id].set_choose(-3);
+                                        }
+                                        if (grids[grid_id].zombies[k]->show_z_type() == z_ground) {
                                             lose = true;
                                             return;
                                         }
                                         else {
-                                            grids[i*MAP_COL+j].free_zombie(k);
+                                            grids[grid_id].free_zombie(k);
                                         }
                                     }
                                     else {
-                                        grids[i*MAP_COL+j].zombies[k]->set_direction(paths[grids[i*MAP_COL+j].zombies[k]->show_path()][next]);
-                                        grids[next].add_zombie(grids[i*MAP_COL+j].zombies[k]);
-                                        grids[i*MAP_COL+j].del_zombie(k);   
+                                        grids[grid_id].zombies[k]->set_direction(paths[grids[grid_id].zombies[k]->show_path()][next]);
+                                        int tmp_c = grids[next].add_zombie(grids[grid_id].zombies[k]);
+                                        if (cursor_choose == grid_id && k == grids[grid_id].show_choose()) {
+                                            grids[grid_id].set_choose(-3);
+                                            cursor_choose = next;
+                                            grids[cursor_choose].set_choose(tmp_c);
+                                        }
+                                        grids[grid_id].del_zombie(k);   
                                     }                               
                                 }
                             }

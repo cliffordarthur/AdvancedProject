@@ -31,6 +31,7 @@ public:
     Grid();
     bool has_pumpkin()const {return plant_p;}
     int show_plant_type()const;
+    int show_zombie_type()const;
     void set_type(int t){if (type!=g_z_base) type = t;}
     int show_type() const {return type;}
     void set_coordinate(int x0, int y0);
@@ -38,7 +39,7 @@ public:
     void add_plant(int c);
     void use_shovel(int c);
 
-    void add_zombie(Zombies* z);
+    int add_zombie(Zombies* z);
     void del_zombie(int z);
     void free_zombie(int z);
 
@@ -62,12 +63,14 @@ public:
 
 class Map{
     std::vector<Grid> grids;
+    std::vector<Bullet> bullets;
     std::vector< std::vector<int> > paths;
     std::vector<int> start;
     std::vector<int> length;
 
     int spec_type;
     int spec_coord;
+    int cursor_choose;
 public:
     bool can_buy;
     Map(){}

@@ -9,7 +9,6 @@ Board::Board(wxFrame *parent): wxPanel(parent, wxID_ANY, wxDefaultPosition){
     cursor_x = 0;
     cursor_y = 0;
     time_counter = 0;
-    cursor_choose = -1;
     has_start = false;
     has_pause = false;
     lose = false;
@@ -105,26 +104,26 @@ void Board::OnPaint(wxPaintEvent &event) {
                 if (map.grids[i*MAP_COL+j].show_type() == remote) dc.SetBrush(wxColour(DARKGREY)); 
                 else if (map.grids[i*MAP_COL+j].show_type() == g_z_base) dc.SetBrush(wxColour(GREY31));
                 else dc.SetBrush(wxColour(LIGHTGREY)); 
-                if (cursor_choose >= 0) {
-                    int tmp_choose = map.grids[cursor_choose].show_choose();
+                if (map.cursor_choose >= 0) {
+                    int tmp_choose = map.grids[map.cursor_choose].show_choose();
                     switch (tmp_choose) {
                         case -3: break;
                         case -2: {
-                            if (cursor_choose == i*MAP_COL+j) {
+                            if (map.cursor_choose == i*MAP_COL+j) {
                                 dc.SetPen(wxPen(wxColour(ORANGE), 4, wxPENSTYLE_SOLID));
                             }
                             break;
                         }
                         case -1: {
-                            int tmp_p_type = map.grids[cursor_choose].show_plant_type();
+                            int tmp_p_type = map.grids[map.cursor_choose].show_plant_type();
                             if (tmp_p_type == farmer) {
-                                if (abs(i*MAP_COL+j-cursor_choose)<=1 || abs(i*MAP_COL+j-cursor_choose)==MAP_COL) {
+                                if (abs(i*MAP_COL+j-map.cursor_choose)<=1 || abs(i*MAP_COL+j-map.cursor_choose)==MAP_COL) {
                                     dc.SetPen(wxPen(wxColour(ORANGE), 4, wxPENSTYLE_SOLID));
                                 }
                             }
                             else {
-                                int tmp_range = plant_table[map.grids[cursor_choose].show_plant_type()].range;
-                                int tmp_x = cursor_choose/MAP_COL, tmp_y = cursor_choose%MAP_COL;
+                                int tmp_range = plant_table[tmp_p_type].range;
+                                int tmp_x = map.cursor_choose/MAP_COL, tmp_y = map.cursor_choose%MAP_COL;
                                 if (abs(i-tmp_x)<=tmp_range && abs(j-tmp_y)<=tmp_range) {
                                     dc.SetPen(wxPen(wxColour(ORANGE), 4, wxPENSTYLE_SOLID));
                                 }
@@ -132,7 +131,31 @@ void Board::OnPaint(wxPaintEvent &event) {
                             break;
                         }
                         default: {
-                            // TODO: show zombie attack range
+                            int tmp_z_type = map.grids[map.cursor_choose].show_zombie_type();
+                            if (tmp_z_type == necromancer) {
+                                Necromancer *tmp_z = new Necromancer();
+                                int tmp_range = tmp_z->show_encourage_r();
+                                delete tmp_z;
+                                int tmp_x = map.cursor_choose/MAP_COL, tmp_y = map.cursor_choose%MAP_COL;
+                                if (abs(i-tmp_x)<=tmp_range && abs(j-tmp_y)<=tmp_range) {
+                                    dc.SetPen(wxPen(wxColour(PURPLE), 4, wxPENSTYLE_DOT));
+                                }
+                            }
+                            else {
+                                int tmp_range = zombie_table[tmp_z_type].range;
+                                int tmp_x = map.cursor_choose/MAP_COL, tmp_y = map.cursor_choose%MAP_COL;
+                                if (abs(i-tmp_x)<=tmp_range && abs(j-tmp_y)<=tmp_range) {
+                                    dc.SetPen(wxPen(wxColour(ORANGE), 4, wxPENSTYLE_SOLID));
+                                }
+                                else if (tmp_z_type == frostwyrm) {
+                                    Frostwyrm *tmp_z = new Frostwyrm();
+                                    int freeze_range = tmp_z->show_freeze_r();
+                                    delete tmp_z;
+                                    if (abs(i-tmp_x)<=freeze_range && abs(j-tmp_y)<=freeze_range) {
+                                        dc.SetPen(wxPen(wxColour(CYAN), 4, wxPENSTYLE_DOT));
+                                    }
+                                }
+                            }
                         }
                     }
                     
@@ -157,27 +180,28 @@ void Board::OnPaint(wxPaintEvent &event) {
         dc.DrawText("Poisoned: ", wxPoint(INFO_BEGIN_X+10, INFO_BEGIN_Y+16*INFO_GAP_Y));
         dc.DrawText("Crazy: ", wxPoint(INFO_BEGIN_X+10, INFO_BEGIN_Y+19*INFO_GAP_Y));
         dc.DrawText("Evil: ", wxPoint(INFO_BEGIN_X+10, INFO_BEGIN_Y+22*INFO_GAP_Y));
-        dc.DrawText("Recharge: ", wxPoint(INFO_BEGIN_X+10, INFO_BEGIN_Y+2*GRID_SIZE+4*INFO_GAP_Y));
         dc.DrawText("Special: ", wxPoint(INFO_BEGIN_X+10, INFO_BEGIN_Y+4*GRID_SIZE+4*INFO_GAP_Y));
 
-        if (cursor_choose >= 0) {
-            int Co = (map.grids[cursor_choose].show_choose()<0)?GREEN1:RED;
-            paint_info(dc, Co, map.grids[cursor_choose].show_info().name, 180, 4);
-            paint_info(dc, Co, map.grids[cursor_choose].show_info().race, 180, 7);
-            paint_info(dc, RED, map.grids[cursor_choose].show_info().HP, 180, 10);
-            paint_info(dc, CYAN, map.grids[cursor_choose].show_info().F, 180, 13);
-            paint_info(dc, GREEN4, map.grids[cursor_choose].show_info().P, 180, 16);
-            paint_info(dc, RED, map.grids[cursor_choose].show_info().C, 180, 19);
-            paint_info(dc, PURPLE, map.grids[cursor_choose].show_info().E, 180, 22);
+        if (map.cursor_choose >= 0) {
+            int Co = (map.grids[map.cursor_choose].show_choose()<0)?GREEN1:RED;
+            paint_info(dc, Co, map.grids[map.cursor_choose].show_info().name, 180, 4);
+            paint_info(dc, Co, map.grids[map.cursor_choose].show_info().race, 180, 7);
+            paint_info(dc, RED, map.grids[map.cursor_choose].show_info().HP, 180, 10);
+            paint_info(dc, CYAN, map.grids[map.cursor_choose].show_info().F, 180, 13);
+            paint_info(dc, GREEN4, map.grids[map.cursor_choose].show_info().P, 180, 16);
+            paint_info(dc, RED, map.grids[map.cursor_choose].show_info().C, 180, 19);
+            paint_info(dc, PURPLE, map.grids[map.cursor_choose].show_info().E, 180, 22);
+            
+            if (Co==GREEN1) {paint_info(dc, BLACK, "Recharge: ", 10, 4, 2);}
+            else {paint_info(dc, BLACK, "Distance: ", 10, 4, 2);}
+            paint_info(dc, ORANGE, map.grids[map.cursor_choose].show_info().recharge, 180, 4, 2);
+            paint_info(dc, BLACK, map.grids[map.cursor_choose].show_info().info, 10, 7, 2);
 
-            paint_info(dc, ORANGE, map.grids[cursor_choose].show_info().recharge, 180, 4, 2);
-            paint_info(dc, BLACK, map.grids[cursor_choose].show_info().info, 10, 7, 2);
-
-            paint_info(dc, BLACK, map.grids[cursor_choose].show_info().special, 88, 4, 4);
+            paint_info(dc, BLACK, map.grids[map.cursor_choose].show_info().special, 88, 4, 4);
             int order[5];
             
-            if (map.grids[cursor_choose].show_choose()==-1 && map.grids[cursor_choose].show_plant_type()==farmer){
-                for (int h = 0; h < 5; h++) order[h] = map.grids[cursor_choose].show_tmp_order(h);
+            if (map.grids[map.cursor_choose].show_choose()==-1 && map.grids[map.cursor_choose].show_plant_type()==farmer){
+                for (int h = 0; h < 5; h++) order[h] = map.grids[map.cursor_choose].show_tmp_order(h);
                 DrawStrategy(dc, 0, STRATEGY_X, STRATEGY_Y, STRATEGY_SIZE, order);
             }
         }
@@ -228,7 +252,7 @@ void Board::OnLeftDown(wxMouseEvent &event) {
                             sun += (shop.ret_sun(pumpkin)+shop.buy());
                         }
                         else if (shop.show_cart() == -1) {
-                            cursor_choose = grid_id;
+                            map.cursor_choose = grid_id;
                             map.grids[grid_id].set_choose(-2);
                         }
                     }
@@ -241,7 +265,7 @@ void Board::OnLeftDown(wxMouseEvent &event) {
                             sun += (shop.ret_sun(tmp_type)+shop.buy());
                         }
                         else if (shop.show_cart() == -1) {
-                            cursor_choose = grid_id;
+                            map.cursor_choose = grid_id;
                             map.grids[grid_id].set_choose(-1);
                         }
                     }
@@ -250,27 +274,28 @@ void Board::OnLeftDown(wxMouseEvent &event) {
             else if (relative_y <= a_lowest) {
                 int shape_n = inShape(relative_x, relative_y, false, z_air);
                 if (0 <= shape_n && shape_n < map.grids[grid_id].show_a_z_num()) {
-                    cursor_choose = grid_id;
-                    map.grids[cursor_choose].set_choose(map.grids[cursor_choose].return_zumbie_order(shape_n, false));
+                    map.cursor_choose = grid_id;
+                    map.grids[map.cursor_choose].set_choose(map.grids[map.cursor_choose].return_zumbie_order(shape_n, false));
                 }
             }
             else {
                 int shape_n = inShape(relative_x, relative_y, false, z_ground);
                 if (0 <= shape_n && shape_n < map.grids[grid_id].show_g_z_num()) {
-                    cursor_choose = grid_id;
-                    map.grids[cursor_choose].set_choose(map.grids[cursor_choose].return_zumbie_order(shape_n));
+                    map.cursor_choose = grid_id;
+                    map.grids[map.cursor_choose].set_choose(map.grids[map.cursor_choose].return_zumbie_order(shape_n));
                 }
             }
         }
     }
-    else if (cursor_choose>=0 && map.grids[cursor_choose].show_choose()==-1 && map.grids[cursor_choose].show_plant_type()==farmer &&
+    else if (map.cursor_choose>=0 && map.grids[map.cursor_choose].show_choose()==-1 && map.grids[map.cursor_choose].show_plant_type()==farmer &&
              INFO_BEGIN_X<=cursor_x && INFO_BEGIN_Y+4*GRID_SIZE<=cursor_y) {
         if (INFO_BEGIN_X+STRATEGY_X+3*STRATEGY_SIZE <= cursor_x && cursor_x <= INFO_BEGIN_X+STRATEGY_X+9*STRATEGY_SIZE/2) {
-            if (INFO_BEGIN_Y+4*GRID_SIZE+STRATEGY_Y+STRATEGY_SIZE <= cursor_y && cursor_y <= INFO_BEGIN_Y+4*GRID_SIZE+STRATEGY_Y+2*STRATEGY_SIZE) {
-                map.grids[cursor_choose].set_order();
+            if (INFO_BEGIN_Y+4*GRID_SIZE+STRATEGY_Y+STRATEGY_SIZE <= cursor_y && cursor_y <= INFO_BEGIN_Y+4*GRID_SIZE+STRATEGY_Y+2*STRATEGY_SIZE &&
+                map.grids[map.cursor_choose].show_tmp_order(4)!=-1) {
+                map.grids[map.cursor_choose].set_order();
             }
             if (INFO_BEGIN_Y+4*GRID_SIZE+STRATEGY_Y+STRATEGY_SIZE <= cursor_y && cursor_y <= INFO_BEGIN_Y+4*GRID_SIZE+STRATEGY_Y+3*STRATEGY_SIZE) {
-                for (int i = 0; i < 5; i++) map.grids[cursor_choose].set_tmp_order(i, -1);
+                for (int i = 0; i < 5; i++) map.grids[map.cursor_choose].set_tmp_order(i, -1);
             }
         }
         else {
@@ -280,9 +305,9 @@ void Board::OnLeftDown(wxMouseEvent &event) {
             if (0<=stray && stray<=2 && 0<=strax && strax<=2 && (stray==1||strax==1)) {
                 int grid_id = 2*strax+stray-1;
                 for (int i = 0; i < 5; i++) {
-                    if (map.grids[cursor_choose].show_tmp_order(i) == grid_id) break;
-                    if (map.grids[cursor_choose].show_tmp_order(i)<0) {
-                        map.grids[cursor_choose].set_tmp_order(i, grid_id);
+                    if (map.grids[map.cursor_choose].show_tmp_order(i) == grid_id) break;
+                    if (map.grids[map.cursor_choose].show_tmp_order(i)<0) {
+                        map.grids[map.cursor_choose].set_tmp_order(i, grid_id);
                         break;
                     }
                 }  
@@ -295,7 +320,7 @@ void Board::OnLeftDown(wxMouseEvent &event) {
 void Board::OnRightDown(wxMouseEvent &event) {
     if (!has_start || has_pause || lose || time_counter>FPS*WIN_SEC) return;
     shop.clear_cart();
-    cursor_choose = -1;
+    map.cursor_choose = -1;
 }
 
 void Board::read_map(FILE *fp) {

@@ -294,3 +294,22 @@ Frostwyrm::Frostwyrm() {
     this->freeze_time = 10;  
     this->freeze_r = 1;
 }
+
+Bullet::Bullet() {
+    this->type = bullet;
+
+    this->damage = zombie_table[this->type].damage;
+    this->speed = zombie_table[this->type].speed;
+    this->counter = this->speed;
+    this->stride = zombie_table[this->type].stride;
+    this->scounter = this->stride;
+
+    this->direction = 0;
+}
+
+void Bullet::Set_Bullet(int x, int y, int direction, int damage) {
+    this->grid_x = x;
+    this->grid_y = y;
+    this->direction = direction;
+    this->damage = damage;
+}

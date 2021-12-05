@@ -20,6 +20,10 @@ int Grid::show_plant_type() const{
     return plant_0->show_type();
 }
 
+int Grid::show_zombie_type() const{
+    return zombies[choose]->show_type();
+}
+
 void Grid::set_coordinate(int x0, int y0) {
     x = x0;
     y = y0;
@@ -106,17 +110,18 @@ void Grid::use_shovel(int c) {
     }
 }
 
-void Grid::add_zombie(Zombies *z){
+int Grid::add_zombie(Zombies *z){
     if (z_num < ZOMBIE_NUM) {
         z_num++; 
         if (z->show_z_type()==z_air) a_z_num++;
         for (int i = 0; i < ZOMBIE_NUM; i++) {
             if (this->zombies[i]==NULL){
                 this->zombies[i] = z;
-                return;
+                return i;
             }
         }
     }
+    return -3;
 }
 
 void Grid::del_zombie(int z) {
@@ -227,7 +232,7 @@ Info Grid::show_info() const {
                 i.name = wxString(plant_table[plant_0->show_type()].name);
                 i.race = wxString("Plants");
                 i.HP = wxString::Format("%d/%d", plant_0->show_HP(), plant_0->show_t_HP());
-                i.F = wxString::Format("%.2f", (double)plant_0->show_freeze()/FPS);
+                i.F = wxString::Format("%.2fs", (double)plant_0->show_freeze()/FPS);
                 i.recharge = wxString::Format("%d", plant_table[plant_0->show_type()].CDtime/FPS);
                 i.info = plant_table[plant_0->show_type()].info;
                 i.special = wxString("");
@@ -242,7 +247,20 @@ Info Grid::show_info() const {
             break;
         }
         default: {
-            
+            i.name = wxString(zombie_table[zombies[choose]->show_type()].name);
+            i.race = wxString("Zombies");
+            i.HP = wxString::Format("%d/%d", zombies[choose]->show_HP(), zombies[choose]->show_t_HP());
+            i.C = zombies[choose]->show_crazy()?"Yes":"No";
+            i.E = (zombies[choose]->show_encourage()>0)?"Yes":"No";
+            i.P = wxString::Format("%.2fs", (double)zombies[choose]->show_poison()/FPS);
+            i.recharge = wxString::Format("%d%%", 100*zombies[choose]->show_scounter()/zombie_table[zombies[choose]->show_type()].stride);
+            i.info = zombie_table[zombies[choose]->show_type()].info;
+            i.special = zombie_table[zombies[choose]->show_type()].special;
+            if (zombies[choose]->show_type()==gargantuar) {
+                if (zombies[choose]->has_throw == -1) {i.special = "imp is not hurled";}
+                else if(zombies[choose]->has_throw > 0) {i.special = "imp is being hurled";}
+                else {i.special = "imp has been hurled";}
+            }
         }
     }
     return i;

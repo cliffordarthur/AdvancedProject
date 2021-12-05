@@ -32,7 +32,7 @@ inline int max(int a, int b) {
 
 enum Plantname{sunflower, cherry, pumpkin, wallnut, spikeweed, bamboo, cabbage, farmer, pea, dryad, shovel};
 
-enum Zombiename{zombie, conehead, imp, gargantuar, necromancer, catapult, balloon, bomber, frostwyrm};
+enum Zombiename{zombie, conehead, imp, gargantuar, necromancer, catapult, balloon, bomber, frostwyrm, bullet};
 
 enum Directions{diup, didown, dileft, diright, diend};
 

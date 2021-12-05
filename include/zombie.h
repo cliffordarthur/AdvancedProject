@@ -14,25 +14,46 @@ struct Zombietable{
     bool attack_direction; // false: forward; true: around
     bool warlike;
     int z_type;
+    wxString info;
+    wxString special;
 }static zombie_table[] = {
-    {"     zombie",      zombie,  100, FPS*1, 5,  10,  10, 0,  true,  true, z_ground}, 
-    {"   conehead",    conehead,  200, FPS*1, 5,  20,  10, 0,  true,  true, z_ground},
-    {"        imp",         imp,   50, FPS/2, 5,  10,  10, 0,  true,  true, z_ground}, 
-    {" gargantuar",  gargantuar, 1000, FPS*5, 1, 100, 500, 1, false,  true, z_ground},
-    {"necromancer", necromancer,  100, FPS*1, 5,  30,   1, 0,  true,  true, z_ground},
-    {"   catapult",    catapult,  200, FPS*1, 5,  30,  20, 2,  true,  true, z_ground},
+    {     "zombie",      zombie,  100, FPS*1,   5,  10,  10, 0,  true,  true, z_ground, 
+        "Regular garden-variety zombie.", 
+        "---"}, 
+    {   "conehead",    conehead,  200, FPS*1,   5,  20,  10, 0,  true,  true, z_ground,
+        "His traffic cone headpiece makes him\ntwice as tough as normal zombies.",
+        "---"},
+    {        "imp",         imp,   50, FPS/2,   5,  10,  10, 0,  true,  true, z_ground, 
+        "Imps are tiny zombies hurled by \nGargantuar deep into your defences.", 
+        "---"}, 
+    { "gargantuar",  gargantuar, 1000, FPS*5,   1, 100, 500, 1, false,  true, z_ground, 
+        "Gargantuar is a gigantic zombie.", 
+        "hurl imps"},
+    {"necromancer", necromancer,  100, FPS*1,   5,  30,   1, 0,  true,  true, z_ground,
+        "Necromancers cannot attack plants.\nInstead, they attack zombies and\nincrease their attack power",
+        "---"},
+    {   "catapult",    catapult,  200, FPS*1,   5,  30,  20, 2,  true,  true, z_ground, 
+        "Catapult zombie operates heavy\nmachinery.", 
+        "lobs stones at one plant"},
     
-    {"    balloon",     balloon,  100, FPS/2, 5,  20,   0, 0,  true, false,    z_air},
-    {"     bomber",      bomber,  200, FPS/2, 5,  30,  20, 0,  true, false,    z_air},
-    {"  frostwyrm",   frostwyrm,  400, FPS*2, 3, 100,  10, 0,  true,  true,    z_air},
+    {    "balloon",     balloon,  100, FPS/2,   5,  20,   0, 0,  true, false,    z_air,
+        "Balloon zombie floats above the fray,\nimmune to most attacks.",
+        "flying"},
+    {     "bomber",      bomber,  200, FPS/2,   5,  30,  20, 0,  true, false,    z_air, 
+        "Bomber can attack plants without\nstoping.",
+        "flying"},
+    {  "frostwyrm",   frostwyrm,  400, FPS*2,   3, 100,  10, 0,  true,  true,    z_air, 
+        "Frostwyrm is a gigantic zombie in the\nair",
+        "flying\nfreezing plants nearby"},
+    {     "bullet",      bullet,    1,     1, FPS,   0,   1, 0,  true,  true, z_ground, "", ""},
 };
 
-const int zombie_num = sizeof(zombie_table)/sizeof(zombie_table[0]);
+const int zombie_num = sizeof(zombie_table)/sizeof(zombie_table[0])-1;
 
 class Zombies{
 protected:
     int type;
-    int HP, total_HP;;
+    int HP, total_HP;
     int damage, speed, stride; 
     int counter, scounter;
     int path;
@@ -139,4 +160,11 @@ public:
     Frostwyrm();
     int freeze()const{return freeze_time;}
     int show_freeze_r()const{return freeze_r;}
+};
+
+class Bullet:public Zombies{
+    int grid_x, grid_y;
+public:
+    Bullet();
+    void Set_Bullet(int x, int y, int direction, int damage);
 };
