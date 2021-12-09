@@ -242,6 +242,12 @@ Info Grid::show_info() const {
                     }
                     i.special += directions[show_order(4)];
                 }
+                else if (show_plant_type()==pea) {
+                    if (show_order()==diup) {i.special="up";}
+                    if (show_order()==didown) {i.special="down";}
+                    if (show_order()==dileft) {i.special="left";}
+                    if (show_order()==diright) {i.special="right";}
+                }
                 else i.special = plant_table[plant_0->show_type()].strategy;
             }
             break;
@@ -264,4 +270,10 @@ Info Grid::show_info() const {
         }
     }
     return i;
+}
+
+int Grid::show_choose_direction() {
+    if (choose==-1 && show_plant_type()==pea) {return plant_0->show_strategy();}
+    else if (choose>=0 && zombies[choose]->show_type()==gargantuar) {return zombies[choose]->show_direction();}
+    else return -1;
 }

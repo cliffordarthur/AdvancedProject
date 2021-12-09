@@ -1,7 +1,7 @@
 #include "../../include/plant.h"
 
 void Plant::cooldown() {
-    if ((find_zombie>=0 ||type==sunflower||type==farmer||type==cherry)&&(counter>0)) counter--;
+    if ((find_zombie>=0||type==sunflower||type==farmer||type==cherry) && (counter>0)) counter--;
     else counter = speed;
 }
 
@@ -95,11 +95,6 @@ Farmer::Farmer() {
     this->order[2] = 4;
     this->order[3] = 1;
     this->order[4] = 0;
-    // this->tmp_order[0] = 2;
-    // this->tmp_order[1] = 3;
-    // this->tmp_order[2] = 4;
-    // this->tmp_order[3] = 1;
-    // this->tmp_order[4] = 0;
 }
 
 Dryad::Dryad() {
@@ -184,4 +179,7 @@ Pea::Pea() {
     this->counter = this->speed;
     this->stop_num = plant_table[this->type].stop_num;
     this->a_target = plant_table[this->type].attack_target;
+
+    this->direction = diright;
+    this->tmp_direction = -1;
 }

@@ -73,7 +73,7 @@ public:
     Zombies():has_throw(-1){}
     void cooldown();
     int walk();
-    int cross_grid(int i, int j);
+    int cross_grid(int i, int j, bool isbullet=false);
     
     int attack()const{return damage;}
     int show_type()const{return type;}
@@ -82,6 +82,7 @@ public:
     int show_counter()const{return counter;}
     int show_scounter()const{return scounter;}
     int show_path()const {return path;}
+    int show_direction()const {return direction;}
     int show_r_g()const {return remain_grid;}
     int show_range()const {return range;}
     bool show_a_d()const {return a_d;}
@@ -108,6 +109,8 @@ public:
 
     virtual int freeze()const{return 0;}
     virtual int show_freeze_r()const{return 0;}
+    virtual int show_pos()const{return -1;}
+    virtual void set_pos(int grid_id){}
 };
 
 class Zombie:public Zombies{
@@ -165,6 +168,8 @@ public:
 class Bullet:public Zombies{
     int grid_x, grid_y;
 public:
-    Bullet();
-    void Set_Bullet(int x, int y, int direction, int damage);
+    Bullet(){}
+    Bullet(int coord, int direction, int damage);
+    int show_pos()const{return grid_x*MAP_COL+grid_y;}
+    void set_pos(int grid_id){grid_x=grid_id/MAP_COL; grid_y=grid_id%MAP_COL;}
 };

@@ -1,5 +1,4 @@
 #pragma once 
-#include "common.h"
 #include "plant.h"
 #include "zombie.h"
 
@@ -51,19 +50,20 @@ public:
     int show_choose() const {return choose;}
     Info show_info() const;
 
-    int show_order(int i)const {if (plant_0) {return plant_0->show_strategy(i);} else {return -1;}}
-    int show_tmp_order(int i)const {if (plant_0) {return plant_0->show_tmp_strategy(i);} else {return -1;}}
+    int show_order(int i=0)const {if (plant_0) {return plant_0->show_strategy(i);} else {return -1;}}
+    int show_tmp_order(int i=0)const {if (plant_0) {return plant_0->show_tmp_strategy(i);} else {return -1;}}
     void set_order(){plant_0->set_strategy();}
-    void set_tmp_order(int i, int j){plant_0->set_tmp_strategy(i, j);}
+    void set_tmp_order(int i, int j=0){plant_0->set_tmp_strategy(i, j);}
     int show_g_z_num()const{return z_num-a_z_num;}
     int show_a_z_num()const{return a_z_num;}
     int return_zumbie_order(int i, bool g = true)const {if (g) {return show_g_z[i];}else {return show_a_z[i];}}
+    int show_choose_direction();
     friend class Map;
 };
 
 class Map{
     std::vector<Grid> grids;
-    std::vector<Bullet> bullets;
+    std::vector<Bullet*> bullets;
     std::vector< std::vector<int> > paths;
     std::vector<int> start;
     std::vector<int> length;
@@ -74,7 +74,7 @@ class Map{
 public:
     bool can_buy;
     Map(){}
-    ~Map();
+    ~Map(){}
     void set_Map();
     void update(int& sun, bool& lose, int& score);
     void draw(int cursor_x, int cursor_y);
@@ -96,6 +96,8 @@ const int pumpkin_x = GRID_SIZE/6;
 const int pumpkin_y = GRID_SIZE/6;
 
 const int p_other_r = GRID_SIZE/8;
+
+const int bullet_r = GRID_SIZE/30;
 
 const std::vector<std::vector<wxPoint> > PlantShape = { 
     {wxPoint(GRID_SIZE*7/12, GRID_SIZE*7/24), wxPoint(GRID_SIZE*11/12, GRID_SIZE*7/24), 

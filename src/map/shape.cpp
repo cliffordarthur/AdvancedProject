@@ -101,7 +101,13 @@ void DrawStrategy(wxPaintDC &dc, int type, int x, int y, int size, int order[]) 
             break;
         }
         case 1: {
-            // TODO: pea
+            wxPoint wp;
+            if (order[0]==0) {wp = wxPoint(INFO_BEGIN_X+x+size/4, INFO_BEGIN_Y+4*GRID_SIZE+y+size/4);}
+            else if (order[0]==2) {wp = wxPoint(INFO_BEGIN_X+x-3*size/4, INFO_BEGIN_Y+4*GRID_SIZE+y+5*size/4);}
+            else if (order[0]==3) {wp = wxPoint(INFO_BEGIN_X+x+5*size/4, INFO_BEGIN_Y+4*GRID_SIZE+y+5*size/4);}
+            else if (order[0]==1) {wp = wxPoint(INFO_BEGIN_X+x+size/4, INFO_BEGIN_Y+4*GRID_SIZE+y+9*size/4);}
+            else break;
+            dc.DrawText("1", wp);
             break;
         }
         default: {}

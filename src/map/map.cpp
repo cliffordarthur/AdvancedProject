@@ -10,8 +10,6 @@ int get_digits(int num) {
     return d;
 }
 
-Map::~Map() {}
-
 void Map::set_Map(){
     can_buy = true;
     spec_type = -1;
@@ -35,16 +33,35 @@ void Map::set_Map(){
 /*Return the coordinates of zombie within range r. Return -1 if zombie does not exists*/
 int Map::find_zombies(int x, int y, Plant *p) {
     int r = p->show_range();
-    for (int rr = 0; rr <= r; rr++){
-        for (int i = -rr; i <= rr; i++) {
-            if (x + i < 0 || x + i >= MAP_LINE) continue;
-            for (int j = -rr; j <= rr; j++) {
-                if (y + j < 0 || y + j >= MAP_COL || (-rr+1<=i && i<=rr-1 && -rr+1<=j && j<=rr-1)) continue;
-                int target = (x+i)*MAP_COL+y+j;
-                if ((p->show_a_t() == z_air && grids[target].a_z_num) || 
-                    (p->show_a_t() == z_both && grids[target].z_num) ||
-                    (p->show_a_t() == z_ground && (grids[target].z_num>grids[target].a_z_num))){
-                    return target;
+    if (p->show_type() == pea) {
+        int target = x*MAP_COL+y;
+        while (r>=0) {
+            if (grids[target].z_num-grids[target].a_z_num) {
+                return target;
+            }
+            switch (p->show_strategy()){
+                case    diup: {target = (target<MAP_COL)?(-1):(target-MAP_COL); break;}
+                case  didown: {target = (target/MAP_COL==MAP_LINE-1)?(-1):(target+MAP_COL); break;}
+                case  dileft: {target = (target%MAP_COL==0)?(-1):(target-1); break;}
+                case diright: {target = (target%MAP_COL==MAP_COL-1)?(-1):(target+1); break;}
+                default: break;
+            }
+            r--;
+            if (target==-1) return -1;
+        }
+    }
+    else {
+        for (int rr = 0; rr <= r; rr++){
+            for (int i = -rr; i <= rr; i++) {
+                if (x + i < 0 || x + i >= MAP_LINE) continue;
+                for (int j = -rr; j <= rr; j++) {
+                    if (y + j < 0 || y + j >= MAP_COL || (-rr+1<=i && i<=rr-1 && -rr+1<=j && j<=rr-1)) continue;
+                    int target = (x+i)*MAP_COL+y+j;
+                    if ((p->show_a_t() == z_air && grids[target].a_z_num) || 
+                        (p->show_a_t() == z_both && grids[target].z_num) ||
+                        (p->show_a_t() == z_ground && (grids[target].z_num>grids[target].a_z_num))){
+                        return target;
+                    }
                 }
             }
         }
@@ -125,6 +142,37 @@ void Map::farmer_plant_pumpkin(int grid_id) {
 }
 
 void Map::update(int& sun, bool& lose, int& score) {
+    for (std::vector<Bullet*>::iterator it = bullets.begin(); it != bullets.end(); it++) {
+        int grid_id = (*it)->show_pos();
+        if (grids[grid_id].z_num - grids[grid_id].a_z_num) {
+            for (int k = 0; k < ZOMBIE_NUM; k++) {
+                if (grids[grid_id].zombies[k] && grids[grid_id].zombies[k]->show_z_type()!=z_air) {
+                    grids[grid_id].zombies[k]->be_attacked((*it)->attack());
+                    (*it)->be_attacked((*it)->show_HP());
+                    break;
+                }
+            }
+        }
+        else {
+            int ready = (*it)->walk();
+            if (ready) {
+                int next = (*it)->cross_grid(grid_id/MAP_COL, grid_id%MAP_COL, true);
+                if (next<0) {
+                    (*it)->be_attacked((*it)->show_HP());
+                }
+                else {
+                    (*it)->set_pos(next);
+                }
+            }
+        }
+    }
+    for (std::vector<Bullet*>::iterator it = bullets.end()-1; it != bullets.begin()-1; it--) {
+        if ((*it)->show_HP() <= 0) {
+            delete (*it);
+            bullets.erase(it);
+        }
+    }
+
     for (int i = 0; i < MAP_LINE; i++) { 
         for (int j = 0; j < MAP_COL; j++) {
             int grid_id = i*MAP_COL+j;
@@ -187,8 +235,7 @@ void Map::update(int& sun, bool& lose, int& score) {
                             break;
                         }
                         case bamboo:
-                        case cabbage:
-                        case pea: {
+                        case cabbage:{
                             if (grids[grid_id].plant_0->find_zombie >= 0 && grids[grid_id].plant_0->show_counter()==0) {
                                 int target = grids[grid_id].plant_0->find_zombie;
                                 for (int k = 0; k < ZOMBIE_NUM; k++) {
@@ -197,6 +244,12 @@ void Map::update(int& sun, bool& lose, int& score) {
                                         break;
                                     }
                                 }
+                            }
+                            break;
+                        }
+                        case pea: {
+                            if (grids[grid_id].plant_0->find_zombie >= 0 && grids[grid_id].plant_0->show_counter()==0) {
+                                bullets.push_back(new Bullet(grid_id, grids[grid_id].plant_0->show_strategy(), grids[grid_id].plant_0->attack()));
                             }
                             break;
                         }
@@ -244,6 +297,7 @@ void Map::update(int& sun, bool& lose, int& score) {
                              grids[grid_id].zombies[k]->show_r_g() == 0)){
                         Zombies *o = grids[grid_id].zombies[k];
                         Zombie *z = new Zombie(o->show_HP(), o->show_scounter(), o->show_path(), o->show_poison());
+                        z->set_total_HP(o->show_t_HP());
                         z->set_direction(paths[z->show_path()][grid_id], o->show_r_g());
                         int tmp_c = grids[grid_id].add_zombie(z);
                         if (cursor_choose == grid_id && grids[grid_id].show_choose() == k) {

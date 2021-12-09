@@ -1,8 +1,5 @@
 #pragma once 
-#include "common.h"
 #include "map.h"
-#include "plant.h"
-#include "zombie.h"
 
 class MyApp: public wxApp {
 public:
@@ -33,7 +30,7 @@ class Board: public wxPanel {
         shop.no_CDtime();
         CHEAT[2]->SetBackgroundColour(wxColour(GREY));
     }
-    void OnAddEnemy(wxCommandEvent &event) {cheat_gen_zombie(20);}
+    void OnAddEnemy(wxCommandEvent &event) {cheat_gen_zombie(10);}
     void OnKillAll(wxCommandEvent &event) {map.cheat_kill();}
 
     void OnMove(wxMouseEvent &event);

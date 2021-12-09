@@ -14,17 +14,28 @@ int Zombies::walk() {
     return 0;
 }
 
-int Zombies::cross_grid(int i, int j) {
+int Zombies::cross_grid(int i, int j, bool isbullet) {
     int next = i*MAP_COL+j;
-    switch (direction){
-        case diup: {next-=MAP_COL; break;}
-        case didown: {next+=MAP_COL; break;}
-        case dileft: {next-=1; break;}
-        case diright: {next+=1; break;}
-        case diend: {next = -1; break;}
-        default: assert(0);
+    if (!isbullet) {
+        switch (direction){
+            case diup: {next-=MAP_COL; break;}
+            case didown: {next+=MAP_COL; break;}
+            case dileft: {next-=1; break;}
+            case diright: {next+=1; break;}
+            case diend: {next = -1; break;}
+            default: assert(0);
+        }
+        remain_grid--;
     }
-    remain_grid--;
+    else {
+        switch (direction){
+            case diup: {next = (next<MAP_COL)?(-1):(next-MAP_COL); break;}
+            case didown: {next = (next/MAP_COL==MAP_LINE-1)?(-1):(next+MAP_COL); break;}
+            case dileft: {next = (next%MAP_COL==0)?(-1):(next-1); break;}
+            case diright: {next = (next%MAP_COL==MAP_COL-1)?(-1):(next+1); break;}
+            default: assert(0);
+        }
+    }
     return next;
 }
 
@@ -295,21 +306,17 @@ Frostwyrm::Frostwyrm() {
     this->freeze_r = 1;
 }
 
-Bullet::Bullet() {
+Bullet::Bullet(int coord, int direction, int damage) {
     this->type = bullet;
-
+    this->HP = zombie_table[this->type].HP;
     this->damage = zombie_table[this->type].damage;
     this->speed = zombie_table[this->type].speed;
     this->counter = this->speed;
     this->stride = zombie_table[this->type].stride;
     this->scounter = this->stride;
 
-    this->direction = 0;
-}
-
-void Bullet::Set_Bullet(int x, int y, int direction, int damage) {
-    this->grid_x = x;
-    this->grid_y = y;
+    this->grid_x = coord/MAP_COL;
+    this->grid_y = coord%MAP_COL;
     this->direction = direction;
     this->damage = damage;
 }
