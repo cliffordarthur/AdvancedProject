@@ -47,7 +47,7 @@ enum Spec_type{fort, d_fort};
 // P3
 // #define SHOW_COORD
 
-// #define DOCHEAT
+#define DOCHEAT
 
 #define MAP_BEGIN_X 150
 #define MAP_BEGIN_Y 140
