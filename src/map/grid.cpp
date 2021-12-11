@@ -210,6 +210,53 @@ void Grid::paint(wxPaintDC &dc) {
     }
 }
 
+void Grid::flash(wxPaintDC &dc, int k, int colour){
+    int init_x = MAP_BEGIN_X+y*GRID_SIZE, init_y = MAP_BEGIN_Y+x*GRID_SIZE;
+    dc.SetBrush(wxColour(colour));
+    if (k == -2) {    
+        dc.DrawCircle(wxPoint(init_x+pumpkin_x, init_y+pumpkin_y), p_other_r);
+    }
+    else if (k == -1) {
+        int tmp = show_plant_type();
+        if (plant_table[tmp].p_type == p_other) {
+            dc.DrawCircle(wxPoint(init_x, init_y)+PlantShape[p_other][0], p_other_r);
+        }
+        else {
+            wxPoint points[] = {
+                wxPoint(init_x, init_y)+PlantShape[plant_table[tmp].p_type][0], 
+                wxPoint(init_x, init_y)+PlantShape[plant_table[tmp].p_type][1],
+                wxPoint(init_x, init_y)+PlantShape[plant_table[tmp].p_type][2],
+                wxPoint(init_x, init_y)+PlantShape[plant_table[tmp].p_type][3],
+            };
+            dc.DrawPolygon(4, points);
+        }
+    }
+    else {
+        if (!zombies[k]) {}
+        else if (zombies[k]->show_z_type()==z_ground) {
+            for (int i = 0; i < show_g_z.size(); i++) {
+                if (show_g_z[i] == k) {
+                    dc.DrawRectangle(wxPoint(init_x, init_y)+ZombieShape[0][0]+i*ZombieShape[0][2], wxSize(ZombieShape[0][1].x, ZombieShape[0][1].y));
+                    break;
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < show_a_z.size(); i++) {
+                if (show_a_z[i] == k) {
+                    wxPoint points[] = {
+                        wxPoint(init_x, init_y)+ZombieShape[1][0]+i*ZombieShape[1][3], 
+                        wxPoint(init_x, init_y)+ZombieShape[1][1]+i*ZombieShape[1][3], 
+                        wxPoint(init_x, init_y)+ZombieShape[1][2]+i*ZombieShape[1][3], 
+                    };
+                    dc.DrawPolygon(3, points);
+                    break;
+                }
+            }
+        }
+    }
+}
+
 Info Grid::show_info() const {
     Info i;
     switch (choose) {

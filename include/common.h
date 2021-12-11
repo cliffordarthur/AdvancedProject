@@ -45,9 +45,9 @@ enum Zombie_type{z_ground, z_air, z_both};
 enum Spec_type{fort, d_fort};
 
 // P3
-#define SHOW_COORD
+// #define SHOW_COORD
 
-#define DOCHEAT
+// #define DOCHEAT
 
 #define MAP_BEGIN_X 150
 #define MAP_BEGIN_Y 140

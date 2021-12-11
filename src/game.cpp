@@ -203,6 +203,39 @@ void Board::OnPaint(wxPaintEvent &event) {
             dc.DrawCircle(wp, bullet_r);
         }
 
+        for (std::vector<relation>::iterator it = map.relations.begin(); it != map.relations.end(); it++) {
+            switch ((*it).type) {
+                case -1: {
+                    map.grids[(*it).grid_1].flash(dc, -1, LIGHTCYAN);
+                    break;
+                }
+                case  0: {
+                    map.grids[(*it).grid_1].flash(dc, (*it).p1, LIGHTCYAN);
+                    map.grids[(*it).grid_2].flash(dc, (*it).p2, RED);
+                    if ((*it).grid_1 != (*it).grid_2) {
+                        if ((*it).p1 < 0) {
+                            map.paint_line(dc, GREEN1, (*it));
+                        }
+                        else {
+                            map.paint_line(dc, RED, (*it));
+                        }
+                    }
+                    break;
+                }
+                case  1: {
+                    map.grids[(*it).grid_2].flash(dc, (*it).p2, RED);
+                    break;
+                }
+                case  2: {
+                    map.grids[(*it).grid_1].flash(dc, (*it).p1, LIGHTCYAN);
+                    map.grids[(*it).grid_2].flash(dc, (*it).p2, RED);
+                    break;
+                }
+                default: break;
+            }
+        }
+        map.relations.clear();
+
         dc.SetBrush(wxColour(WHITE));
         dc.DrawRectangle(wxPoint(INFO_BEGIN_X, INFO_BEGIN_Y), wxSize(3*GRID_SIZE, 6*GRID_SIZE));
         dc.SetTextForeground(wxColour(BLACK));
@@ -649,7 +682,7 @@ void Board::gen_zombie() {
 
 void Board::cheat_gen_zombie(int num) {
     for (int i = 0; i < num; i++) {
-        int type = rand()%zombie_num;type=balloon;
+        int type = rand()%zombie_num;
         int target, length;
         switch (type) {
             case imp:

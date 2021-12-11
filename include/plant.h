@@ -42,7 +42,7 @@ struct Planttable{
     {    "farmer",    farmer, 100, 450, 30*FPS,   0, 12*FPS,  1, p_remote, ZOMBIE_NUM, z_ground, 
         "Farmers can plant pumpkins nearby.", 
         "---"},
-    {"peashooter",       pea, 100, 100,  6*FPS,  10,  1*FPS,  6, p_remote, ZOMBIE_NUM, z_ground, 
+    {"peashooter",       pea, 100, 100,  6*FPS,  10,  1*FPS,  8, p_remote, ZOMBIE_NUM, z_ground, 
         "Peashooters are your first line of \ndefense. THey shoot peas at attack-\ning zombies.", 
         "---"},
     {     "dryad",     dryad, 100, 150, 12*FPS,   5,  2*FPS,  1, p_remote, ZOMBIE_NUM,   z_both, 

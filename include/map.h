@@ -46,6 +46,7 @@ public:
     void cheat_kill();
 
     void paint(wxPaintDC &dc);
+    void flash(wxPaintDC &dc, int k, int colour);
     void set_choose(int c) {choose = c;}
     int show_choose() const {return choose;}
     Info show_info() const;
@@ -61,9 +62,16 @@ public:
     friend class Map;
 };
 
+struct relation{
+    relation(int t, int p1, int grid1, int p2, int grid2):type(t), p1(p1), grid_1(grid1), p2(p2), grid_2(grid2){}
+    int type; //-1: fire; 0: attack; 1:  hit; 2: cherry
+    int p1, grid_1, p2, grid_2;
+};
+
 class Map{
     std::vector<Grid> grids;
     std::vector<Bullet*> bullets;
+    std::vector<relation> relations;
     std::vector< std::vector<int> > paths;
     std::vector<int> start;
     std::vector<int> length;
@@ -86,7 +94,8 @@ public:
     void cheat_kill() {for (int i = 0; i < grids.size(); i++) grids[i].cheat_kill();}
     void farmer_plant_pumpkin(int grid_id);
 
-    friend class Game;
+    void paint_line(wxPaintDC &dc, int colour, relation r);
+
     friend class Board;
 };
 

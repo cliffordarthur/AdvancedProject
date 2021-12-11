@@ -36,7 +36,7 @@ int Map::find_zombies(int x, int y, Plant *p) {
     if (p->show_type() == pea) {
         int target = x*MAP_COL+y;
         while (r>=0) {
-            if (grids[target].z_num-grids[target].a_z_num) {
+            if (grids[target].show_g_z_num()) {
                 return target;
             }
             switch (p->show_strategy()){
@@ -141,6 +141,56 @@ void Map::farmer_plant_pumpkin(int grid_id) {
     grids[grid_id].plant_0->counter_plus();
 }
 
+void Map::paint_line(wxPaintDC &dc, int colour, relation r){
+    dc.SetPen(wxPen(wxColour(colour), 4, wxPENSTYLE_SOLID));
+    wxPoint wp1(MAP_BEGIN_X+GRID_SIZE*(r.grid_1%MAP_COL), MAP_BEGIN_Y+GRID_SIZE*(r.grid_1/MAP_COL));
+    wxPoint wp2(MAP_BEGIN_X+GRID_SIZE*(r.grid_2%MAP_COL), MAP_BEGIN_Y+GRID_SIZE*(r.grid_2/MAP_COL));
+    if (r.p1==-2) {wp1 += wxPoint(pumpkin_x, pumpkin_y);}
+    else if (r.p1==-1) {wp1 += PlantShape[plant_table[grids[r.grid_1].show_plant_type()].p_type][0];}
+    else {
+        if (!grids[r.grid_1].zombies[r.p1]) {dc.SetPen(wxColour(BLACK));return;}
+        else if (grids[r.grid_1].zombies[r.p1]->show_z_type()==z_ground) {
+            for (int i = 0; i < grids[r.grid_1].show_g_z.size(); i++) {
+                if (grids[r.grid_1].show_g_z[i] == r.p1) {
+                    wp1 += ZombieShape[0][0]+i*ZombieShape[0][2];
+                    break;
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < grids[r.grid_1].show_a_z.size(); i++) {
+                if (grids[r.grid_1].show_a_z[i] == r.p1) {
+                    wp1 += ZombieShape[1][0]+i*ZombieShape[1][3];
+                    break;
+                }
+            }
+        }
+    }
+    if (r.p2==-2) {wp2 += wxPoint(pumpkin_x, pumpkin_y);}
+    else if (r.p2==-1) {wp2 += PlantShape[plant_table[grids[r.grid_2].show_plant_type()].p_type][0];}
+    else {
+        if (!grids[r.grid_2].zombies[r.p2]) {dc.SetPen(wxColour(BLACK));return;}
+        else if (grids[r.grid_2].zombies[r.p2]->show_z_type()==z_ground) {
+            for (int i = 0; i < grids[r.grid_2].show_g_z.size(); i++) {
+                if (grids[r.grid_2].show_g_z[i] == r.p2) {
+                    wp2 += ZombieShape[0][0]+i*ZombieShape[0][2];
+                    break;
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < grids[r.grid_2].show_a_z.size(); i++) {
+                if (grids[r.grid_2].show_a_z[i] == r.p2) {
+                    wp2 += ZombieShape[1][0]+i*ZombieShape[1][3];
+                    break;
+                }
+            }
+        }
+    }
+    dc.DrawLine(wp1, wp2);
+    dc.SetPen(wxColour(BLACK));
+}
+
 void Map::update(int& sun, bool& lose, int& score) {
     for (std::vector<Bullet*>::iterator it = bullets.begin(); it != bullets.end(); it++) {
         int grid_id = (*it)->show_pos();
@@ -149,6 +199,7 @@ void Map::update(int& sun, bool& lose, int& score) {
                 if (grids[grid_id].zombies[k] && grids[grid_id].zombies[k]->show_z_type()!=z_air) {
                     grids[grid_id].zombies[k]->be_attacked((*it)->attack());
                     (*it)->be_attacked((*it)->show_HP());
+                    relations.push_back(relation(1, -1, grid_id, k, grid_id));
                     break;
                 }
             }
@@ -206,10 +257,11 @@ void Map::update(int& sun, bool& lose, int& score) {
                         }
                         case spikeweed: {
                             if (grids[grid_id].plant_0->find_zombie >= 0 && grids[grid_id].plant_0->show_counter()==0) {
-                                for (int k = 0, zz = 0; k < ZOMBIE_NUM && zz < grids[grid_id].z_num-grids[grid_id].a_z_num; k++) {
+                                for (int k = 0, zz = 0; k < ZOMBIE_NUM && zz < grids[grid_id].show_g_z_num(); k++) {
                                     if (grids[grid_id].zombies[k] && grids[grid_id].zombies[k]->show_z_type()!=z_air) {
                                         zz++;
                                         grids[grid_id].zombies[k]->be_attacked(grids[grid_id].plant_0->attack());
+                                        relations.push_back(relation(0, -1, grid_id, k, grid_id));
                                     }
                                 }
                             }
@@ -228,6 +280,7 @@ void Map::update(int& sun, bool& lose, int& score) {
                                     if (grids[target].zombies[k]) {
                                         grids[target].zombies[k]->be_attacked(grids[grid_id].plant_0->attack());
                                         grids[target].zombies[k]->be_poisoned(grids[grid_id].plant_0->poison());
+                                        relations.push_back(relation(0, -1, grid_id, k, target));
                                         break;
                                     }
                                 }
@@ -241,6 +294,7 @@ void Map::update(int& sun, bool& lose, int& score) {
                                 for (int k = 0; k < ZOMBIE_NUM; k++) {
                                     if (grids[target].zombies[k]) {
                                         grids[target].zombies[k]->be_attacked(grids[grid_id].plant_0->attack());
+                                        relations.push_back(relation(0, -1, grid_id, k, target));
                                         break;
                                     }
                                 }
@@ -250,6 +304,7 @@ void Map::update(int& sun, bool& lose, int& score) {
                         case pea: {
                             if (grids[grid_id].plant_0->find_zombie >= 0 && grids[grid_id].plant_0->show_counter()==0) {
                                 bullets.push_back(new Bullet(grid_id, grids[grid_id].plant_0->show_strategy(), grids[grid_id].plant_0->attack()));
+                                relations.push_back(relation(-1, -1, grid_id, 0, 0));
                             }
                             break;
                         }
@@ -264,6 +319,7 @@ void Map::update(int& sun, bool& lose, int& score) {
                                             if (grids[(i+_i)*MAP_COL+j+_j].zombies[k]) {
                                                 zz++;
                                                 grids[(i+_i)*MAP_COL+j+_j].zombies[k]->be_attacked(grids[grid_id].plant_0->attack());
+                                                relations.push_back(relation(2, -1, grid_id, k, (i+_i)*MAP_COL+j+_j));
                                             }
                                         }
                                     }
@@ -331,8 +387,8 @@ void Map::update(int& sun, bool& lose, int& score) {
                             if (target != -1 || grids[grid_id].zombies[k]->show_type()==necromancer) {
                                 switch (grids[grid_id].zombies[k]->show_type()) {
                                     case frostwyrm: {
-                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[grid_id].zombies[k]->attack());}
-                                        else if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[grid_id].zombies[k]->attack());}
+                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[grid_id].zombies[k]->attack());relations.push_back(relation(0, k, grid_id, -2, target));}
+                                        else if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[grid_id].zombies[k]->attack());relations.push_back(relation(0, k, grid_id, -1, target));}
 
                                         int r = grids[grid_id].zombies[k]->show_freeze_r();
                                         for (int _i = -r; _i <= r; _i++) {
@@ -357,6 +413,7 @@ void Map::update(int& sun, bool& lose, int& score) {
                                                         zz++;
                                                         if (grids[e_target].zombies[kk]->show_type() != necromancer && grids[e_target].zombies[kk]->show_type() != balloon) {
                                                             grids[e_target].zombies[kk]->get_encouraged();
+                                                            relations.push_back(relation(0, grid_id, k, e_target, kk));
                                                         }
                                                     }
                                                 }
@@ -366,13 +423,13 @@ void Map::update(int& sun, bool& lose, int& score) {
                                         break;
                                     }
                                     case gargantuar: {
-                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[grid_id].zombies[k]->attack());}
-                                        if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[grid_id].zombies[k]->attack());}
+                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[grid_id].zombies[k]->attack());relations.push_back(relation(0, k, grid_id, -2, target));}
+                                        if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[grid_id].zombies[k]->attack());relations.push_back(relation(0, k, grid_id, -1, target));}
                                         break;
                                     }
                                     default: {
-                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[grid_id].zombies[k]->attack());}
-                                        else if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[grid_id].zombies[k]->attack());}
+                                        if (grids[target].plant_p) {grids[target].plant_p->be_attacked(grids[grid_id].zombies[k]->attack());relations.push_back(relation(0, k, grid_id, -2, target));}
+                                        else if (grids[target].plant_0) {grids[target].plant_0->be_attacked(grids[grid_id].zombies[k]->attack());relations.push_back(relation(0, k, grid_id, -1, target));}
                                         break;
                                     }
                                 }
